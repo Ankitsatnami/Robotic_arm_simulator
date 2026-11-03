@@ -1198,7 +1198,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
                         </div>
                         <div class="drawer-actions">
                             <button class="nav-btn" id="btn-toggle-drawer" style="height:26px; font-size:11px;">
-                                â–² Expand Details Panel
+                                &#9650; Expand Details Panel
                             </button>
                         </div>
                     </div>
@@ -1209,7 +1209,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
                             <!-- 4x4 HOMOGENEOUS MATRIX -->
                             <div class="matrix-card">
                                 <div class="matrix-title">
-                                    <span>Homogeneous Transform Matrix [Tâ‚€â¶] (Forward Kinematics)</span>
+                                    <span>Homogeneous Transform Matrix [T<sub>0</sub><sup>6</sup>] (Forward Kinematics)</span>
                                     <span id="mat-summary-pos" style="color:var(--accent-green); font-family:var(--font-mono); font-size:11px;"></span>
                                 </div>
                                 <table class="matrix-table">
@@ -1218,22 +1218,22 @@ input[type="range"]::-webkit-slider-thumb:hover {
                                     </tbody>
                                 </table>
                                 <div style="margin-top:10px; font-size:11px; color:var(--text-muted); display:flex; gap:16px;">
-                                    <span><strong style="color:#38bdf8;">â–  Blue:</strong> 3x3 Rotation [R]</span>
-                                    <span><strong style="color:var(--accent-green);">â–  Green:</strong> Position Vector [P]</span>
+                                    <span><strong style="color:#38bdf8;">&#9632; Blue:</strong> 3x3 Rotation [R]</span>
+                                    <span><strong style="color:var(--accent-green);">&#9632; Green:</strong> Position Vector [P]</span>
                                 </div>
                             </div>
 
                             <!-- 6x6 JACOBIAN & MANIPULABILITY -->
                             <div class="matrix-card">
                                 <div class="matrix-title">
-                                    <span>Geometric Jacobian Matrix [Jâ‚†â‚“â‚†]</span>
+                                    <span>Geometric Jacobian Matrix [J<sub>6&times;6</sub>]</span>
                                     <span id="jac-manipulability" style="color:var(--accent-cyan); font-family:var(--font-mono); font-size:11px;"></span>
                                 </div>
                                 <div class="jacobian-grid" id="jacobian-cells">
                                     <!-- 36 Jacobian elements -->
                                 </div>
                                 <div style="margin-top:8px; font-size:11px; color:var(--text-secondary); line-height:1.4;">
-                                    Rows 1â€“3: Linear Velocity Part ($J_v$). Rows 4â€“6: Angular Velocity Part ($J_\omega$). Near zero determinant indicates kinematic singularity.
+                                    Rows 1&ndash;3: Linear Velocity Part (J<sub>v</sub>). Rows 4&ndash;6: Angular Velocity Part (J<sub>&omega;</sub>). Near-zero determinant indicates kinematic singularity.
                                 </div>
                             </div>
                         </div>
@@ -1274,7 +1274,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
                     <!-- 4. TRAJECTORY SEQUENCER PANE -->
                     <div class="drawer-content-pane" id="pane-trajectory">
                         <div class="trajectory-toolbar">
-                            <button class="primary-btn" id="btn-traj-play" style="padding:0 14px;">â–¶ Play Path</button>
+                            <button class="primary-btn" id="btn-traj-play" style="padding:0 14px;">&#9654; Play Path</button>
                             <button class="secondary-btn" id="btn-traj-pause">Pause</button>
                             <button class="secondary-btn" id="btn-traj-stop">Stop</button>
                             <button class="secondary-btn" id="btn-traj-loop">Loop: OFF</button>
@@ -1341,7 +1341,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     <div class="modal-overlay" id="info-modal" style="display:none;">
         <div class="modal-dialog">
             <div class="modal-header">
-                <div class="modal-title">Fanuc Cobot Kinematics Playground — Research & Docs</div>
+                <div class="modal-title">Fanuc Cobot Kinematics Playground &mdash; Research & Docs</div>
                 <button class="modal-close" id="btn-close-modal">&times;</button>
             </div>
             <div style="font-size:13px; line-height:1.6; color:var(--text-secondary);">
@@ -1399,7 +1399,7 @@ class KinematicsEngine {
                 type: 'Cobot 6-DOF',
                 reach: 1249, // mm
                 payload: '10 kg',
-                repeatability: '±0.04 mm',
+                repeatability: '&plusmn;0.04 mm',
                 weight: '40 kg',
                 // Physical link lengths in millimeters
                 dh: [
@@ -1424,7 +1424,7 @@ class KinematicsEngine {
                 type: 'Collaborative 6-DOF',
                 reach: 850,
                 payload: '5 kg',
-                repeatability: '±0.03 mm',
+                repeatability: '&plusmn;0.03 mm',
                 weight: '20.6 kg',
                 dh: [
                     { name: 'J1', d: 162.5, a: 0.0,    alpha: Math.PI / 2,  min: -360, max: 360, speed: 180 },
@@ -1448,7 +1448,7 @@ class KinematicsEngine {
                 type: 'Industrial 6-DOF',
                 reach: 901,
                 payload: '6 kg',
-                repeatability: '±0.02 mm',
+                repeatability: '&plusmn;0.02 mm',
                 weight: '52 kg',
                 dh: [
                     { name: 'J1', d: 400.0, a: 25.0,  alpha: -Math.PI / 2, min: -170, max: 170, speed: 360 },
@@ -1472,7 +1472,7 @@ class KinematicsEngine {
                 type: 'Academic Standard 6-DOF',
                 reach: 878,
                 payload: '4 kg',
-                repeatability: '±0.1 mm',
+                repeatability: '&plusmn;0.1 mm',
                 weight: '53 kg',
                 dh: [
                     { name: 'J1', d: 671.8, a: 0.0,   alpha: -Math.PI / 2, min: -160, max: 160, speed: 100 },
@@ -3556,7 +3556,7 @@ class RoboticArmSimulator {
                 if (drawer && drawer.classList.contains('collapsed')) {
                     drawer.classList.remove('collapsed');
                     const toggleBtn = document.getElementById('btn-toggle-drawer');
-                    if (toggleBtn) toggleBtn.textContent = '▼ Collapse Details Panel';
+                    if (toggleBtn) toggleBtn.textContent = '&#9660; Collapse Details Panel';
                     setTimeout(() => this.onWindowResize(), 220);
                 }
 
@@ -3579,7 +3579,7 @@ class RoboticArmSimulator {
             const isCollapsed = drawer.classList.contains('collapsed');
             const toggleBtn = document.getElementById('btn-toggle-drawer');
             if (toggleBtn) {
-                toggleBtn.textContent = isCollapsed ? '▲ Expand Details Panel' : '▼ Collapse Details Panel';
+                toggleBtn.textContent = isCollapsed ? '&#9650; Expand Details Panel' : '&#9660; Collapse Details Panel';
             }
             setTimeout(() => this.onWindowResize(), 220);
         });
