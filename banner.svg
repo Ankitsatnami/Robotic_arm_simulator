@@ -1,278 +1,428 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 200" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 280" width="100%" height="100%">
   <defs>
-    <!-- Glow Filters -->
-    <filter id="orangeGlow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur"/>
-      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 1   0 0 0 0 0.6   0 0 0 0 0   0 0 0 0.75 0" result="glow"/>
+    <!-- 3D Drop Shadows & Neon Glow Filters -->
+    <filter id="dropShadow3D" x="-20%" y="-20%" width="150%" height="150%">
+      <feDropShadow dx="4" dy="8" stdDeviation="5" flood-color="#000000" flood-opacity="0.75"/>
+    </filter>
+
+    <filter id="neonOrange" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur1"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur2"/>
       <feMerge>
-        <feMergeNode in="glow"/>
+        <feMergeNode in="blur2"/>
+        <feMergeNode in="blur1"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
 
-    <filter id="cyanGlow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur"/>
-      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0   0 0 0 0 0.9   0 0 0 0 1   0 0 0 0.65 0" result="glow"/>
+    <filter id="neonCyan" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur1"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="blur2"/>
       <feMerge>
-        <feMergeNode in="glow"/>
+        <feMergeNode in="blur2"/>
+        <feMergeNode in="blur1"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
 
-    <!-- Gradients -->
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0B0F19"/>
-      <stop offset="100%" stop-color="#151C2C"/>
+    <!-- 3D Surface & Metallic Gradients -->
+    <radialGradient id="bgRadial" cx="30%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#111C33"/>
+      <stop offset="60%" stop-color="#090E1A"/>
+      <stop offset="100%" stop-color="#04070D"/>
+    </radialGradient>
+
+    <linearGradient id="metalBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F8FAFC"/>
+      <stop offset="35%" stop-color="#CBD5E1"/>
+      <stop offset="70%" stop-color="#64748B"/>
+      <stop offset="100%" stop-color="#1E293B"/>
     </linearGradient>
 
-    <linearGradient id="armMetal" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#E2E8F0"/>
+    <linearGradient id="metalDark" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#475569"/>
+      <stop offset="50%" stop-color="#1E293B"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+
+    <linearGradient id="orange3D" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFB703"/>
+      <stop offset="50%" stop-color="#FB8500"/>
+      <stop offset="100%" stop-color="#9A3412"/>
+    </linearGradient>
+
+    <linearGradient id="cyanLaser" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00F5D4" stop-opacity="0.9"/>
+      <stop offset="50%" stop-color="#00BBF9" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#00BBF9" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="textMetal" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="65%" stop-color="#E2E8F0"/>
       <stop offset="100%" stop-color="#94A3B8"/>
     </linearGradient>
 
-    <linearGradient id="shineGradient" x1="0" y1="0" x2="1" y2="0">
+    <linearGradient id="shineSweepGrad" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0"/>
       <stop offset="45%" stop-color="#FFFFFF" stop-opacity="0"/>
-      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.6"/>
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.35"/>
       <stop offset="55%" stop-color="#FFFFFF" stop-opacity="0"/>
       <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
     </linearGradient>
 
-    <!-- Tech Grid Pattern -->
-    <pattern id="techGrid" width="24" height="24" patternUnits="userSpaceOnUse">
-      <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#1E293B" stroke-width="0.8"/>
-    </pattern>
-
-    <clipPath id="bannerClip">
-      <rect width="680" height="200" rx="14"/>
+    <clipPath id="cardClip">
+      <rect width="850" height="280" rx="18"/>
     </clipPath>
 
     <style>
-      .font-main {
-        font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
-        font-weight: 800;
-        fill: #FFFFFF;
-        letter-spacing: 2px;
+      .title-main {
+        font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+        font-weight: 900;
+        font-size: 46px;
+        letter-spacing: 2.5px;
       }
-      .font-sub {
-        font-family: 'Courier New', Courier, monospace;
+      .title-sub {
+        font-family: 'Courier New', Consolas, monospace;
         font-weight: 700;
-        fill: #FF9900;
-        letter-spacing: 5.5px;
+        font-size: 18px;
+        letter-spacing: 7px;
+        fill: #00F5D4;
       }
-      .font-hud {
-        font-family: 'Courier New', Courier, monospace;
-        font-size: 10px;
-        fill: #00E5FF;
-        opacity: 0.75;
+      .hud-mono {
+        font-family: 'Courier New', Consolas, monospace;
+        font-size: 10.5px;
+        fill: #64748B;
+        font-weight: 600;
+      }
+      .hud-val {
+        font-family: 'Courier New', Consolas, monospace;
+        font-size: 10.5px;
+        fill: #00F5D4;
+        font-weight: 700;
       }
 
-      /* Outline Drawing Effect */
-      .guide-path {
+      /* Initial Blueprint Wireframe Draw */
+      .blueprint {
         fill: none;
-        stroke: #00E5FF;
-        stroke-width: 2;
-        stroke-linecap: round;
-        stroke-linejoin: round;
+        stroke: #00F5D4;
+        stroke-width: 1.5;
         stroke-dasharray: 1;
         stroke-dashoffset: 1;
-        animation: drawLine 1.3s cubic-bezier(0.34, 0.01, 0.14, 1) forwards,
-                   guideFade 0.4s ease 1.3s forwards;
+        animation: drawWire 1.4s cubic-bezier(0.25, 1, 0.5, 1) forwards,
+                   fadeWire 0.5s ease 1.4s forwards;
       }
 
-      /* Solid Pieces Fade In */
-      .solid-piece {
+      /* 3D Solid Assembly Reveal */
+      .mesh-3d {
         opacity: 0;
-        animation: reveal 0.6s ease 0.85s forwards;
+        animation: meshReveal 0.8s ease 0.9s forwards;
       }
 
-      /* Text Staggered Reveal */
-      .word-1 { opacity: 0; animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 1.2s forwards; }
-      .word-2 { opacity: 0; animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 1.45s forwards; }
-      .word-3 { opacity: 0; animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 1.7s forwards; }
+      /* Multi-Axis 3D Inverse Kinematics Animations */
+      .ik-shoulder {
+        transform-origin: 155px 195px;
+        animation: rotShoulder 7s cubic-bezier(0.45, 0.05, 0.55, 0.95) 1.8s infinite;
+      }
+      .ik-elbow {
+        transform-origin: 105px 102px;
+        animation: rotElbow 7s cubic-bezier(0.45, 0.05, 0.55, 0.95) 1.8s infinite;
+      }
+      .ik-wrist {
+        transform-origin: 215px 68px;
+        animation: rotWrist 7s cubic-bezier(0.45, 0.05, 0.55, 0.95) 1.8s infinite;
+      }
+      .claw-upper {
+        transform-origin: 242px 62px;
+        animation: pinchUp 3.5s ease-in-out 1.8s infinite;
+      }
+      .claw-lower {
+        transform-origin: 242px 74px;
+        animation: pinchDown 3.5s ease-in-out 1.8s infinite;
+      }
 
-      /* Glowing Orange Servo Joints */
-      .joint-pop {
-        opacity: 0;
-        filter: url(#orangeGlow);
+      /* Rotating Telemetry Rings & Laser */
+      .hud-ring-cw {
         transform-box: fill-box;
         transform-origin: center;
-        animation: dotPop 0.7s cubic-bezier(0.17, 0.89, 0.28, 1.28) 1.1s forwards,
-                   softPulse 3s ease-in-out 2s infinite;
+        animation: spinCW 8s linear infinite;
       }
-
-      /* Robotic Arm Kinematic Movement */
-      .shoulder-group {
-        transform-origin: 115px 145px;
-        animation: shoulderMove 6s ease-in-out 2.2s infinite;
-      }
-      .elbow-group {
-        transform-origin: 75px 80px;
-        animation: elbowMove 6s ease-in-out 2.2s infinite;
-      }
-      .wrist-group {
-        transform-origin: 150px 50px;
-        animation: wristMove 6s ease-in-out 2.2s infinite;
-      }
-      .target-orb {
+      .hud-ring-ccw {
         transform-box: fill-box;
         transform-origin: center;
-        animation: orbFloat 3s ease-in-out infinite;
+        animation: spinCCW 6s linear infinite;
+      }
+      .laser-scan {
+        animation: laserPulse 3.5s ease-in-out 1.8s infinite;
+      }
+      .holo-cube {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: cubeFloat 3.5s ease-in-out infinite;
       }
 
-      /* Periodic Shine Sweep */
-      .shine-rect {
+      /* Staggered UI Panels */
+      .ui-1 { opacity: 0; animation: slideIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) 1.1s forwards; }
+      .ui-2 { opacity: 0; animation: slideIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) 1.35s forwards; }
+      .ui-3 { opacity: 0; animation: slideIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) 1.6s forwards; }
+
+      .shine-pass {
         opacity: 0;
         mix-blend-mode: overlay;
-        animation: shineSweep 4.5s ease-in-out 2.6s infinite;
+        animation: sweep 5.5s ease-in-out 2.5s infinite;
       }
 
-      @keyframes drawLine {
-        to { stroke-dashoffset: 0; }
-      }
-      @keyframes guideFade {
-        to { opacity: 0; }
-      }
-      @keyframes reveal {
-        to { opacity: 1; }
-      }
-      @keyframes slideUp {
-        from { opacity: 0; transform: translateY(14px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      @keyframes dotPop {
-        0% { opacity: 0; transform: scale(0.1); }
-        65% { opacity: 1; transform: scale(1.25); }
-        100% { opacity: 1; transform: scale(1); }
-      }
-      @keyframes softPulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.1); }
-      }
-      @keyframes shoulderMove {
-        0%, 100% { transform: rotate(0deg); }
-        45% { transform: rotate(12deg); }
-        75% { transform: rotate(-6deg); }
-      }
-      @keyframes elbowMove {
-        0%, 100% { transform: rotate(0deg); }
-        45% { transform: rotate(-22deg); }
-        75% { transform: rotate(10deg); }
-      }
-      @keyframes wristMove {
-        0%, 100% { transform: rotate(0deg); }
-        45% { transform: rotate(18deg); }
-        75% { transform: rotate(-12deg); }
-      }
-      @keyframes orbFloat {
-        0%, 100% { transform: scale(1); opacity: 0.9; }
-        50% { transform: scale(1.3); opacity: 1; }
-      }
-      @keyframes shineSweep {
-        0%, 20% { opacity: 0; transform: translateX(-250px) skewX(-20deg); }
-        35% { opacity: 0.7; }
-        60%, 100% { opacity: 0; transform: translateX(750px) skewX(-20deg); }
+      @keyframes drawWire { to { stroke-dashoffset: 0; } }
+      @keyframes fadeWire { to { opacity: 0; } }
+      @keyframes meshReveal { to { opacity: 1; } }
+      @keyframes slideIn {
+        from { opacity: 0; transform: translateX(20px); }
+        to { opacity: 1; transform: translateX(0); }
       }
 
-      @media (prefers-reduced-motion: reduce) {
-        * {
-          animation: none !important;
-          opacity: 1 !important;
-          stroke-dashoffset: 0 !important;
-          transform: none !important;
-        }
-        .guide-path, .shine-rect { opacity: 0 !important; }
+      @keyframes rotShoulder {
+        0%, 100% { transform: rotate(0deg); }
+        35% { transform: rotate(14deg); }
+        70% { transform: rotate(-8deg); }
+      }
+      @keyframes rotElbow {
+        0%, 100% { transform: rotate(0deg); }
+        35% { transform: rotate(-24deg); }
+        70% { transform: rotate(12deg); }
+      }
+      @keyframes rotWrist {
+        0%, 100% { transform: rotate(0deg); }
+        35% { transform: rotate(16deg); }
+        70% { transform: rotate(-10deg); }
+      }
+      @keyframes pinchUp {
+        0%, 100% { transform: rotate(0deg); }
+        50% { transform: rotate(8deg); }
+      }
+      @keyframes pinchDown {
+        0%, 100% { transform: rotate(0deg); }
+        50% { transform: rotate(-8deg); }
+      }
+      @keyframes spinCW { to { transform: rotate(360deg); } }
+      @keyframes spinCCW { to { transform: rotate(-360deg); } }
+      @keyframes laserPulse {
+        0%, 100% { opacity: 0.25; }
+        50% { opacity: 0.85; }
+      }
+      @keyframes cubeFloat {
+        0%, 100% { transform: translateY(0px) scale(1); }
+        50% { transform: translateY(-5px) scale(1.06); }
+      }
+      @keyframes sweep {
+        0%, 25% { opacity: 0; transform: translateX(-300px) skewX(-22deg); }
+        40% { opacity: 0.8; }
+        65%, 100% { opacity: 0; transform: translateX(950px) skewX(-22deg); }
       }
     </style>
   </defs>
 
-  <g clip-path="url(#bannerClip)">
-    <!-- Dark Tech Background & Grid -->
-    <rect width="680" height="200" fill="url(#bgGrad)"/>
-    <rect width="680" height="200" fill="url(#techGrid)"/>
-    <rect width="678" height="198" x="1" y="1" rx="13" fill="none" stroke="#334155" stroke-width="1.5"/>
+  <g clip-path="url(#cardClip)">
+    <!-- 1. Deep 3D Space Background -->
+    <rect width="850" height="280" fill="url(#bgRadial)"/>
 
-    <!-- Decorative HUD Arcs & Coordinates -->
-    <path d="M 35 165 A 95 95 0 0 1 190 50" fill="none" stroke="#00E5FF" stroke-width="1" stroke-dasharray="4 4" opacity="0.3"/>
-    <text x="24" y="28" class="font-hud">SYS: 3-DOF_KINEMATICS // ONLINE</text>
-    <text x="24" y="185" class="font-hud">θ1: 45.0° | θ2: -30.2° | GRIP: ACTIVE</text>
+    <!-- 2. Isometric 3D Perspective Floor Grid (Left Stage) -->
+    <g opacity="0.28" stroke="#00BBF9" stroke-width="0.8">
+      <!-- Isometric Diamond Grid Lines -->
+      <path d="M 30 225 L 175 165 L 320 225 L 175 275 Z" fill="#00BBF9" fill-opacity="0.04" stroke-width="1.2"/>
+      <line x1="66" y1="210" x2="211" y2="262"/>
+      <line x1="102" y1="195" x2="247" y2="249"/>
+      <line x1="138" y1="180" x2="283" y2="236"/>
+      <line x1="283" y1="210" x2="138" y2="262"/>
+      <line x1="247" y1="195" x2="102" y2="249"/>
+      <line x1="211" y1="180" x2="66" y2="236"/>
+      <!-- Z-Axis Vertical Reference Line -->
+      <line x1="155" y1="25" x2="155" y2="230" stroke="#FF9900" stroke-dasharray="3 4" opacity="0.6"/>
+    </g>
 
-    <!-- ================= ROBOTIC ARM ASSEMBLY ================= -->
-    <g id="robotArm">
-      <!-- Base Pedestal (Static) -->
-      <ellipse cx="115" cy="170" rx="58" ry="6" fill="#000000" opacity="0.45"/>
-      <path class="solid-piece" d="M 75 170 L 85 152 L 145 152 L 155 170 Z" fill="#475569"/>
-      <rect class="solid-piece" x="92" y="142" width="46" height="12" rx="3" fill="#94A3B8"/>
-      <path class="guide-path" pathLength="1" d="M 75 170 L 85 152 L 145 152 L 155 170 Z M 92 142 H 138 V 154 H 92 Z"/>
+    <!-- Ambient Floor Glow Under Base -->
+    <ellipse cx="155" cy="232" rx="75" ry="18" fill="#00BBF9" opacity="0.15" filter="url(#neonCyan)"/>
+    <ellipse cx="155" cy="232" rx="52" ry="12" fill="#000000" opacity="0.7"/>
 
-      <!-- Joint 1: Shoulder & Lower Arm -->
-      <g class="shoulder-group">
-        <!-- Link 1 -->
-        <path class="solid-piece" d="M 104 148 L 65 84 L 85 74 L 126 140 Z" fill="url(#armMetal)"/>
-        <!-- Link 1 Inner Cutout -->
-        <path class="solid-piece" d="M 105 135 L 78 90 L 84 86 L 112 131 Z" fill="#0F172A"/>
-        <path class="guide-path" pathLength="1" d="M 104 148 L 65 84 L 85 74 L 126 140 Z"/>
+    <!-- ================= 3. 3D INDUSTRIAL ROBOTIC ARM ================= -->
+    <g id="robotArm3D">
 
-        <!-- Shoulder Servo Dot -->
-        <circle class="joint-pop" cx="115" cy="145" r="13" fill="#FF9900"/>
-        <circle class="solid-piece" cx="115" cy="145" r="5" fill="#0F172A"/>
+      <!-- 3D Rotating Turret Base (Pedestal) -->
+      <g class="mesh-3d" filter="url(#dropShadow3D)">
+        <!-- Base Bottom Plate -->
+        <ellipse cx="155" cy="228" rx="48" ry="11" fill="#0F172A" stroke="#334155" stroke-width="1.5"/>
+        <path d="M 107 220 L 107 228 A 48 11 0 0 0 203 228 L 203 220 Z" fill="url(#metalDark)"/>
+        <ellipse cx="155" cy="220" rx="48" ry="11" fill="url(#metalBody)"/>
+        <!-- glowing neon ring on base -->
+        <ellipse cx="155" cy="219" rx="39" ry="8" fill="none" stroke="#00F5D4" stroke-width="1.5" opacity="0.8"/>
+        <!-- Turret Cylinder -->
+        <path d="M 122 196 L 122 217 A 33 7 0 0 0 188 217 L 188 196 Z" fill="url(#metalDark)"/>
+        <ellipse cx="155" cy="196" rx="33" ry="7" fill="url(#metalBody)"/>
+        <!-- Heavy Mounting Brackets -->
+        <path d="M 135 198 L 135 178 C 135 168 175 168 175 178 L 175 198 Z" fill="url(#metalDark)" stroke="#64748B" stroke-width="0.8"/>
+      </g>
+      <path class="blueprint" pathLength="1" d="M 107 220 A 48 11 0 1 0 203 220 A 48 11 0 1 0 107 220 Z M 122 196 L 122 217 M 188 196 L 188 217"/>
 
-        <!-- Joint 2: Elbow & Forearm -->
-        <g class="elbow-group">
-          <!-- Link 2 -->
-          <path class="solid-piece" d="M 71 71 L 147 41 L 154 58 L 79 89 Z" fill="url(#armMetal)"/>
-          <!-- Link 2 Inner Cutout -->
-          <path class="solid-piece" d="M 90 71 L 136 52 L 139 58 L 93 77 Z" fill="#0F172A"/>
-          <path class="guide-path" pathLength="1" d="M 71 71 L 147 41 L 154 58 L 79 89 Z"/>
+      <!-- JOINT 1: SHOULDER & LOWER ARM ASSEMBLY -->
+      <g class="ik-shoulder">
+        <g class="mesh-3d" filter="url(#dropShadow3D)">
+          <!-- Hydraulic Damper Piston (Back) -->
+          <line x1="132" y1="188" x2="96" y2="128" stroke="#475569" stroke-width="7" stroke-linecap="round"/>
+          <line x1="122" y1="171" x2="96" y2="128" stroke="#E2E8F0" stroke-width="3.5" stroke-linecap="round"/>
 
-          <!-- Elbow Servo Dot -->
-          <circle class="joint-pop" cx="75" cy="80" r="11" fill="#FF9900"/>
-          <circle class="solid-piece" cx="75" cy="80" r="4" fill="#0F172A"/>
+          <!-- 3D Extruded Side Depth of Link 1 -->
+          <path d="M 142 198 L 90 106 L 106 95 L 166 188 Z" fill="#0F172A" transform="translate(-5, 4)"/>
 
-          <!-- Joint 3: Wrist & Gripper (End Effector) -->
-          <g class="wrist-group">
-            <!-- Upper & Lower Claws -->
-            <path class="solid-piece" d="M 150 45 L 174 28 L 194 36 L 188 43 L 174 37 L 156 49 Z" fill="#E2E8F0"/>
-            <path class="solid-piece" d="M 150 55 L 174 72 L 194 64 L 188 57 L 174 63 L 156 51 Z" fill="#E2E8F0"/>
-            <path class="guide-path" pathLength="1" d="M 150 45 L 174 28 L 194 36 L 188 43 L 174 37 L 156 49 Z M 150 55 L 174 72 L 194 64 L 188 57 L 174 63 L 156 51 Z"/>
+          <!-- Main Sculpted Metallic Arm Link 1 -->
+          <path d="M 142 198 L 90 106 C 86 98 102 89 108 97 L 168 188 Z" fill="url(#metalBody)" stroke="#94A3B8" stroke-width="1"/>
+          <!-- Recessed Tech Truss Cutout -->
+          <path d="M 142 178 L 106 116 L 114 111 L 151 172 Z" fill="#0F172A" stroke="#334155" stroke-width="1"/>
+          <!-- Glowing Power Conduit -->
+          <path d="M 146 175 L 110 113" stroke="#FF9900" stroke-width="1.8" stroke-linecap="round" opacity="0.85"/>
 
-            <!-- Wrist Servo Dot -->
-            <circle class="joint-pop" cx="150" cy="50" r="9.5" fill="#FF9900"/>
-            <circle class="solid-piece" cx="150" cy="50" r="3.5" fill="#0F172A"/>
+          <!-- 3D Shoulder Servo Housing -->
+          <circle cx="155" cy="192" r="20" fill="url(#metalDark)" stroke="#475569" stroke-width="1.5"/>
+          <circle cx="155" cy="192" r="14" fill="url(#orange3D)"/>
+          <circle cx="155" cy="192" r="6" fill="#0F172A"/>
+        </g>
 
-            <!-- Glowing Energy Node inside Gripper -->
-            <circle class="solid-piece target-orb" cx="195" cy="50" r="5.5" fill="#00E5FF" filter="url(#cyanGlow)"/>
+        <!-- Rotating HUD Ring on Shoulder -->
+        <circle class="hud-ring-cw mesh-3d" cx="155" cy="192" r="25" fill="none" stroke="#FF9900" stroke-width="1.2" stroke-dasharray="10 6 3 6" opacity="0.75"/>
+        <path class="blueprint" pathLength="1" d="M 142 198 L 90 106 L 108 97 L 168 188 Z"/>
+
+        <!-- JOINT 2: ELBOW & FOREARM ASSEMBLY -->
+        <g class="ik-elbow">
+          <g class="mesh-3d" filter="url(#dropShadow3D)">
+            <!-- 3D Extruded Depth of Forearm -->
+            <path d="M 100 92 L 212 58 L 218 76 L 108 114 Z" fill="#0F172A" transform="translate(0, 5)"/>
+
+            <!-- Main Sculpted Forearm Body -->
+            <path d="M 100 92 L 212 58 C 220 56 224 73 216 76 L 108 114 Z" fill="url(#metalBody)" stroke="#94A3B8" stroke-width="1"/>
+            <!-- Forearm Inner Carbon Vent -->
+            <path d="M 125 91 L 194 69 L 197 76 L 128 99 Z" fill="#0F172A" stroke="#334155" stroke-width="0.8"/>
+            <line x1="130" y1="95" x2="192" y2="73" stroke="#00F5D4" stroke-width="1.5" opacity="0.9"/>
+
+            <!-- 3D Elbow Servo Motor -->
+            <circle cx="105" cy="102" r="16" fill="url(#metalDark)" stroke="#475569" stroke-width="1.5"/>
+            <circle cx="105" cy="102" r="11" fill="url(#orange3D)"/>
+            <circle cx="105" cy="102" r="4.5" fill="#0F172A"/>
+          </g>
+
+          <!-- Rotating HUD Ring on Elbow -->
+          <circle class="hud-ring-ccw mesh-3d" cx="105" cy="102" r="21" fill="none" stroke="#00F5D4" stroke-width="1.2" stroke-dasharray="8 5" opacity="0.75"/>
+          <path class="blueprint" pathLength="1" d="M 100 92 L 212 58 L 216 76 L 108 114 Z"/>
+
+          <!-- JOINT 3: WRIST, GRIPPER & LASER SCANNER -->
+          <g class="ik-wrist">
+            <g class="mesh-3d" filter="url(#dropShadow3D)">
+              <!-- Wrist Actuator Block -->
+              <rect x="212" y="56" width="28" height="24" rx="5" fill="url(#metalDark)" stroke="#64748B" stroke-width="1"/>
+              <rect x="234" y="59" width="10" height="18" rx="2" fill="url(#orange3D)"/>
+
+              <!-- Upper Robotic Claw Finger -->
+              <g class="claw-upper">
+                <path d="M 242 61 L 262 44 L 284 50 L 280 56 L 263 52 L 246 65 Z" fill="url(#metalBody)" stroke="#475569" stroke-width="0.8"/>
+                <circle cx="262" cy="48" r="2" fill="#FF9900"/>
+              </g>
+
+              <!-- Lower Robotic Claw Finger -->
+              <g class="claw-lower">
+                <path d="M 242 75 L 262 92 L 284 86 L 280 80 L 263 84 L 246 71 Z" fill="url(#metalBody)" stroke="#475569" stroke-width="0.8"/>
+                <circle cx="262" cy="88" r="2" fill="#FF9900"/>
+              </g>
+
+              <!-- Wrist Servo Cap -->
+              <circle cx="215" cy="68" r="12" fill="url(#metalDark)" stroke="#475569" stroke-width="1.2"/>
+              <circle cx="215" cy="68" r="7.5" fill="url(#orange3D)"/>
+              <circle cx="215" cy="68" r="3" fill="#0F172A"/>
+            </g>
+
+            <!-- Active Laser Cone & Floating 3D Target Cube in Gripper -->
+            <g class="mesh-3d">
+              <polygon class="laser-scan" points="244,68 295,45 295,91" fill="url(#cyanLaser)"/>
+              <!-- Isometric 3D Hologram Cube at End-Effector Target -->
+              <g class="holo-cube" filter="url(#neonCyan)">
+                <polygon points="285,56 297,62 285,68 273,62" fill="#00F5D4" fill-opacity="0.45" stroke="#00F5D4" stroke-width="1.2"/>
+                <polygon points="273,62 285,68 285,81 273,75" fill="#00BBF9" fill-opacity="0.3" stroke="#00F5D4" stroke-width="1.2"/>
+                <polygon points="297,62 285,68 285,81 297,75" fill="#0077B6" fill-opacity="0.35" stroke="#00F5D4" stroke-width="1.2"/>
+              </g>
+            </g>
           </g>
         </g>
       </g>
     </g>
 
-    <!-- ================= TYPOGRAPHY & WORDMARK ================= -->
-    <g id="wordmark">
-      <!-- Line Separator -->
-      <line class="solid-piece" x1="238" y1="38" x2="238" y2="162" stroke="#334155" stroke-width="2" stroke-dasharray="6 4"/>
+    <!-- ================= 4. RIGHT PANEL: 3D TYPOGRAPHY & LIVE TELEMETRY HUD ================= -->
+    <!-- Vertical Tech Divider -->
+    <line x1="345" y1="30" x2="345" y2="250" stroke="#1E293B" stroke-width="2"/>
+    <line x1="345" y1="65" x2="345" y2="145" stroke="#FF9900" stroke-width="2.5" filter="url(#neonOrange)"/>
 
-      <!-- Main Heading: ROBOTIC ARM -->
-      <g class="word-1">
-        <text x="262" y="96" class="font-main" font-size="44">ROBOTIC <tspan fill="#FF9900" filter="url(#orangeGlow)">ARM</tspan></text>
-      </g>
+    <!-- Top Telemetry Status Bar -->
+    <g class="ui-1">
+      <rect x="372" y="34" width="185" height="22" rx="4" fill="#0F172A" stroke="#1E293B" stroke-width="1"/>
+      <circle cx="384" cy="45" r="4" fill="#10B981" filter="url(#neonCyan)"/>
+      <text x="396" y="49" class="hud-mono" fill="#94A3B8">ENGINE: <tspan fill="#10B981">6-AXIS 3D IK</tspan></text>
+      <text x="720" y="49" class="hud-mono">FPS: <tspan class="hud-val">60.0</tspan></text>
+    </g>
 
-      <!-- Sub Heading: SIMULATOR -->
-      <g class="word-2">
-        <rect x="264" y="114" width="235" height="28" rx="5" fill="#1E293B" stroke="#FF9900" stroke-width="1" stroke-opacity="0.5"/>
-        <text x="276" y="134" class="font-sub" font-size="18">SIMULATOR</text>
-        <!-- Blinking Status Dot -->
-        <circle class="joint-pop" cx="520" cy="128" r="6" fill="#00E5FF" filter="url(#cyanGlow)"/>
-      </g>
+    <!-- 3D Extruded Main Title: ROBOTIC ARM -->
+    <g class="ui-1" filter="url(#dropShadow3D)">
+      <!-- 3D Extrusion Shadow Layer -->
+      <text x="373" y="113" class="title-main" fill="#0F172A">ROBOTIC ARM</text>
+      <!-- Main Metallic Gradient Layer -->
+      <text x="370" y="110" class="title-main" fill="url(#textMetal)">ROBOTIC <tspan fill="url(#orange3D)">ARM</tspan></text>
+    </g>
 
-      <!-- Tech Specs Footer -->
-      <g class="word-3">
-        <text x="264" y="165" class="font-hud" fill="#94A3B8">INVERSE KINEMATICS • 3D WORKSPACE • REAL-TIME CONTROL</text>
+    <!-- Subtitle Badge: SIMULATOR -->
+    <g class="ui-2">
+      <rect x="372" y="128" width="248" height="34" rx="6" fill="#0F172A" stroke="#00F5D4" stroke-width="1.2" stroke-opacity="0.6"/>
+      <path d="M 372 136 L 372 154" stroke="#FF9900" stroke-width="4"/>
+      <text x="390" y="151" class="title-sub">SIMULATOR</text>
+
+      <!-- Spinning 3D Gimbal Icon Next to Subtitle -->
+      <g transform="translate(650, 145)">
+        <circle class="hud-ring-cw" cx="0" cy="0" r="15" fill="none" stroke="#00F5D4" stroke-width="1.2" stroke-dasharray="14 6"/>
+        <ellipse class="hud-ring-ccw" cx="0" cy="0" rx="15" ry="6" fill="none" stroke="#FF9900" stroke-width="1.2"/>
+        <circle cx="0" cy="0" r="3" fill="#00F5D4"/>
       </g>
     </g>
 
-    <!-- Shine Sweep Overlay -->
-    <rect class="shine-rect" x="-100" y="0" width="140" height="200" fill="url(#shineGradient)"/>
+    <!-- Bottom Live Kinematics Telemetry Matrix Card -->
+    <g class="ui-3">
+      <rect x="372" y="182" width="435" height="62" rx="8" fill="#090D16" fill-opacity="0.85" stroke="#1E293B" stroke-width="1.2"/>
+
+      <!-- Column 1: Joint Angles -->
+      <text x="388" y="202" class="hud-mono">BASE (θ1): <tspan class="hud-val">+14.2°</tspan></text>
+      <text x="388" y="220" class="hud-mono">ELBOW (θ2): <tspan class="hud-val">-24.8°</tspan></text>
+      <text x="388" y="236" class="hud-mono">WRIST (θ3): <tspan class="hud-val">+16.0°</tspan></text>
+
+      <line x1="518" y1="190" x2="518" y2="236" stroke="#1E293B" stroke-width="1"/>
+
+      <!-- Column 2: End Effector Coordinates -->
+      <text x="534" y="202" class="hud-mono">POS X: <tspan class="hud-val" fill="#FFB703">285.4 mm</tspan></text>
+      <text x="534" y="220" class="hud-mono">POS Y: <tspan class="hud-val" fill="#FFB703">142.0 mm</tspan></text>
+      <text x="534" y="236" class="hud-mono">POS Z: <tspan class="hud-val" fill="#FFB703">089.7 mm</tspan></text>
+
+      <line x1="662" y1="190" x2="662" y2="236" stroke="#1E293B" stroke-width="1"/>
+
+      <!-- Column 3: Torque & Gripper Load Bars -->
+      <text x="678" y="202" class="hud-mono">TORQUE LOAD</text>
+      <rect x="678" y="208" width="110" height="6" rx="3" fill="#1E293B"/>
+      <rect x="678" y="208" width="78" height="6" rx="3" fill="url(#orange3D)"/>
+
+      <text x="678" y="227" class="hud-mono">GRIP FORCE: <tspan class="hud-val">84%</tspan></text>
+      <rect x="678" y="232" width="110" height="6" rx="3" fill="#1E293B"/>
+      <rect x="678" y="232" width="92" height="6" rx="3" fill="#00F5D4"/>
+    </g>
+
+    <!-- Outer Framing Corner Accents -->
+    <path d="M 16 40 L 16 16 L 40 16" fill="none" stroke="#00F5D4" stroke-width="2" opacity="0.7"/>
+    <path d="M 834 40 L 834 16 L 810 16" fill="none" stroke="#00F5D4" stroke-width="2" opacity="0.7"/>
+    <path d="M 16 240 L 16 264 L 40 264" fill="none" stroke="#00F5D4" stroke-width="2" opacity="0.7"/>
+    <path d="M 834 240 L 834 264 L 810 264" fill="none" stroke="#00F5D4" stroke-width="2" opacity="0.7"/>
+
+    <!-- Glassmorphic Border & Periodic Light Sweep -->
+    <rect width="848" height="278" x="1" y="1" rx="17" fill="none" stroke="#334155" stroke-width="1.5"/>
+    <rect class="shine-pass" x="-150" y="0" width="180" height="280" fill="url(#shineSweepGrad)"/>
   </g>
 </svg>
