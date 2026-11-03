@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="banner.svg" alt="Robotic Arm Simulator Banner" width="100%">
+  <img src="banner.svg" alt="Robotic Arm Simulator Banner" width="110%">
 </p>
 
 # Fanuc Cobot Kinematics Playground
