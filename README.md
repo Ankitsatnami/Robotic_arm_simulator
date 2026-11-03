@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://ankitsatnami.github.io/Robotic_arm_simulator/">
-    <img src="banner.svg" alt="Robotic Arm Simulator Banner" width="100%">
+    <img src="https://raw.githubusercontent.com/Ankitsatnami/Robotic_arm_simulator/main/banner.svg" alt="Robotic Arm Simulator Banner" width="100%">
   </a>
 </p>
 
