@@ -1,138 +1,205 @@
-# Fanuc Cobot Kinematics Playground (6-DOF Web Simulator)
+# Fanuc Cobot Kinematics Playground
+### A Real-Time 6-DOF Robotic Arm Simulation & Kinematics Research Platform
 
-एक आधुनिक, हाई-क्वालिटी और इंटरैक्टिव 6-DOF इंडस्ट्रियल रोबोटिक आर्म (Fanuc CRX-10iA Cobot) वेब सिम्युलेटर। इसमें फॉरवर्ड एवं एनालिटिकल इनवर्स काइनेमेटिक्स (8 सॉल्यूशन्स), रियल-टाइम 4x4 होमोजेनियस ट्रांसफॉर्मेशन मैट्रिक्स, 6x6 जेकोबियन मैट्रिक्स, सिंगुलैरिटी डिटेक्शन, न्यूमेटिक ग्रिपर और लर्निंग ट्यूटोरियल्स शामिल हैं।
-
----
-
-## 🌐 Live Web Demos (लाइव लिंक)
-- 🚀 **GitHub Pages Live Link**: [https://ankitsatnami.github.io/Robotic_arm_simulator/](https://ankitsatnami.github.io/Robotic_arm_simulator/)
-- ⚡ **Direct Cloud Live Mirror**: [https://eight-kitchen-mngsz.ship.place/](https://eight-kitchen-mngsz.ship.place/)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-brightgreen?style=for-the-badge&logo=github)](https://ankitsatnami.github.io/Robotic_arm_simulator/)
+[![Platform](https://img.shields.io/badge/Platform-WebGL%20%7C%20Three.js-blue?style=for-the-badge)](https://ankitsatnami.github.io/Robotic_arm_simulator/)
+[![Author](https://img.shields.io/badge/Author-Ankit%20Satnami-orange?style=for-the-badge&logo=github)](https://github.com/Ankitsatnami)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
 ---
 
-## 🚀 How to Run (कैसे चलाएं)
+## 🔬 Project Overview & Abstract
 
-### विकल्प 1: सीधे ब्राउज़र में खोलें (Direct File Access)
-1. अपने फाइल मैनेजर में जाएं: `c:\Ankit Satnami\Projects\Robotic Arm simulator`
-2. `index.html` पर डबल-क्लिक करें। यह आपके डिफ़ॉल्ट ब्राउज़र (Chrome, Edge, Firefox) में तुरंत खुल जाएगा।
+**Fanuc Cobot Kinematics Playground** is an interactive, browser-based 3D robotics simulation and kinematics verification platform developed by **Ankit Satnami**. The platform implements rigorous forward kinematics (FK), closed-form analytical inverse kinematics (IK) yielding all 8 distinct geometric configurations, differential kinematics via a real-time $6 \times 6$ geometric Jacobian, singularity diagnostics, trajectory interpolation (MOVEJ and MOVEL), and multi-platform controller code synthesis.
 
-### विकल्प 2: लोकल वेब सर्वर (Recommended Local Server)
-1. फ़ोल्डर में मौजूद **`start_simulator.bat`** पर डबल-क्लिक करें।
-2. यह ऑटोमैटिक लोकल सर्वर शुरू करेगा और आपके ब्राउज़र में लिंक खोलेगा:
-   👉 **`http://localhost:8080`**
+Designed as an open-access research and educational testbed, the platform provides real-time visualization of Denavit-Hartenberg (DH) coordinate transformations, Yoshikawa manipulability indices, and physical robot workspace envelopes.
 
----
-
-## 🌟 Key Features (मुख्य विशेषताएं)
-
-### 1. Visual Interface 
-* **Fanuc CRX-10iA Cobot Aesthetic**: ग्लॉसी वाइट एरोडायनामिक आर्म्स, सिग्नेचर ग्रीन एक्सेंट रिंग्स, मेटैलिक जॉइंट्स और सॉफ्ट शैडोज़।
-* **Robot Model Selector**: 
-  * Fanuc CRX-10iA (Standard Cobot)
-  * Universal Robots UR5e
-  * KUKA KR6 R900 (Agilus)
-  * Unimation PUMA 560
-* **Joint Controls (J1 – J6)**:
-  * स्मूथ स्लाइडर्स (-180° से +180° / जॉइंट लिमिट्स)
-  * रियल-टाइम डिग्री डिस्प्ले (जैसे स्क्रीनशॉट में: J1=-62°, J2=26°, J3=78°, J4=69°, J5=-68°, J6=75°)
-  * 1-क्लिक "Screenshot Pose" बटन।
-* **Cartesian Target (XYZ & WPR)**:
-  * X, Y, Z (मिलीमीटर में)
-  * W (Yaw), P (Pitch), R (Roll) (डिग्री में)
-  * "Solve Inverse Kinematics" बटन।
-* **Current Configuration**:
-  * FANUC स्टैंडर्ड कॉन्फ़िगरेशन स्ट्रिंग: `Current Config: N D T, 0, 0, 0`
-* **8 Available Analytical IK Solutions (इंटरैक्टिव पिल्स)**:
-  * `F D T, 0, 0, 0`
-  * `N D T, 0, 0, 0` (Active)
-  * `F U T, 0, 0, 0`
-  * `N U T, 0, 0, 0`
-  * `F U B, 0, 0, 0`
-  * `N U B, 0, 0, 0`
-  * `F D B, 0, 0, 0`
-  * `N D B, 0, 0, 0`
-  *(किसी भी पिल पर क्लिक करने से रोबोट आर्म तुरंत उस कॉन्फ़िगरेशन में स्मूथली एनिमेट हो जाता है!)*
+- **Primary Live Deployment**: [https://ankitsatnami.github.io/Robotic_arm_simulator/](https://ankitsatnami.github.io/Robotic_arm_simulator/)
+- **Mirror Deployment**: [https://eight-kitchen-mngsz.ship.place/](https://eight-kitchen-mngsz.ship.place/)
+- **GitHub Repository**: [https://github.com/Ankitsatnami/Robotic_arm_simulator](https://github.com/Ankitsatnami/Robotic_arm_simulator)
+- **Principal Author**: [Ankit Satnami](https://github.com/Ankitsatnami)
 
 ---
 
-### 2. Degree of Freedoms (DOF) Detail
-* 6-DOF का पूरा ब्रेकडाउन:
-  * जॉइंट का प्रकार (Revolute)
-  * फिजिकल मोशन एक्सिस (Yaw, Pitch, Roll)
-  * मोशन रेंज लिमिट्स (Min / Max degrees)
-  * मैक्सिमम रोटेशन स्पीड (°/s)
-  * लाइव जॉइंट एंगल्स
-* 3D ओवरले टॉगल:
-  * जॉइंट रोटेशन रिंग्स (Axes)
-  * लोकल कोऑर्डिनेट फ्रेम्स (Frames - RGB: Red=X, Green=Y, Blue=Z)
-  * रीचेबल वर्कस्पेस एनवलप पॉइंट क्लाउड (Cloud)
+## 📐 Mathematical & Kinematic Formulations
+
+### 1. Forward Kinematics (Denavit-Hartenberg Formulation)
+For each joint link $i \in \{1, \dots, 6\}$, the relative spatial transformation between coordinate frame $\{i-1\}$ and frame $\{i\}$ is described by the standard Denavit-Hartenberg (DH) homogeneous transformation matrix $A_i \in \mathrm{SE}(3)$:
+
+$$
+A_i = \mathrm{Rot}_{z}(\theta_i) \cdot \mathrm{Trans}_{z}(d_i) \cdot \mathrm{Trans}_{x}(a_i) \cdot \mathrm{Rot}_{x}(\alpha_i)
+$$
+
+$$
+A_i = \begin{bmatrix}
+\cos\theta_i & -\sin\theta_i \cos\alpha_i & \sin\theta_i \sin\alpha_i & a_i \cos\theta_i \\
+\sin\theta_i & \cos\theta_i \cos\alpha_i & -\cos\theta_i \sin\alpha_i & a_i \sin\theta_i \\
+0 & \sin\alpha_i & \cos\alpha_i & d_i \\
+0 & 0 & 0 & 1
+\end{bmatrix}
+$$
+
+The cumulative end-effector pose $T_0^6$ relative to the base frame is computed through chained post-multiplication:
+
+$$
+T_0^6 = \prod_{i=1}^{6} A_i(\theta_i) = \begin{bmatrix}
+R_{3 \times 3} & \mathbf{p}_{3 \times 1} \\
+\mathbf{0}_{1 \times 3} & 1
+\end{bmatrix}
+$$
+
+where $R \in \mathrm{SO}(3)$ represents the orientation matrix (parameterized into Fanuc standard Yaw-Pitch-Roll $W$-$P$-$R$ angles) and $\mathbf{p} = [X, Y, Z]^T$ represents tool center position in millimeters.
 
 ---
 
-### 3. Live Transformation Matrix & Jacobian Details
-* **4x4 Homogeneous Transformation Matrix $[T_0^6]$**:
-  $$\begin{bmatrix} r_{11} & r_{12} & r_{13} & p_x \\ r_{21} & r_{22} & r_{23} & p_y \\ r_{31} & r_{32} & r_{33} & p_z \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
-  * $3 \times 3$ रोटेशन सब-मैट्रिक्स $[R]$ (ब्लू कलर कोडेड)
-  * $3 \times 1$ पोजीशन वेक्टर $[P]$ (ग्रीन कलर कोडेड)
-* **6x6 Geometric Jacobian Matrix $[J]$**:
-  * लिनियर वेलोसिटी पार्ट ($J_v$) और एंगुलर वेलोसिटी पार्ट ($J_\omega$)
-  * योशिकावा मैनिपुलेबिलिटी इंडेक्स ($\mu = \sqrt{\det(J J^T)}$)
-* **लाइव सिंगुलैरिटी वार्निंग HUD**:
-  * **Wrist Singularity**: जब Joint 5 का एंगल 0° के करीब हो (J4 और J6 कोलिनियर हो जाते हैं)।
-  * **Shoulder Singularity**: जब रिस्ट सेंटर $Z_0$ बेस एक्सिस के पास आ जाए।
-  * **Boundary Singularity**: जब रोबोट आर्म अपने मैक्सिमम रीच (1249 mm) पर पूरी तरह स्ट्रेच हो जाए।
+### 2. Analytical Inverse Kinematics (Pieper's Decoupling Criterion)
+For 6-DOF industrial manipulators featuring a spherical wrist where axes 4, 5, and 6 intersect at a single point (the wrist center $P_w$), the inverse kinematics problem decouples into two independent sub-problems:
+
+1. **Position Inverse Kinematics**: The wrist center coordinates $\mathbf{p}_w = [x_w, y_w, z_w]^T$ are extracted by offsetting the target position by tool length $d_6$ along the approach axis $\mathbf{a}$:
+   $$\mathbf{p}_w = \mathbf{p} - d_6 R \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix}$$
+   Joints $\theta_1, \theta_2, \theta_3$ are then analytically solved via geometric triangulation.
+2. **Orientation Inverse Kinematics**: With $R_0^3(\theta_1, \theta_2, \theta_3)$ computed, the wrist orientation matrix is isolated:
+   $$R_3^6 = (R_0^3)^T R$$
+   Spherical wrist angles $\theta_4, \theta_5, \theta_6$ are derived using an algebraic Euler Z-Y-Z decomposition.
+
+#### The 8 Closed-Form Kinematic Configurations:
+The solver analytically produces and displays all 8 possible branch solutions:
+
+| Configuration Code | Shoulder ($J_1 / J_2$) | Elbow ($J_3$) | Wrist ($J_5$) | Description |
+|---|---|---|---|---|
+| **F D T, 0, 0, 0** | Front / Top | Down | Flip ($\theta_5 > 0$) | Standard forward reach, flipped wrist |
+| **N D T, 0, 0, 0** | Front / Top | Down | Non-flip ($\theta_5 \le 0$) | **Nominal FANUC CRX-10iA pose** |
+| **F U T, 0, 0, 0** | Front / Top | Up | Flip | Overhead reach, elbow elevated |
+| **N U T, 0, 0, 0** | Front / Top | Up | Non-flip | Elbow up, inverted wrist |
+| **F U B, 0, 0, 0** | Back / Bottom | Up | Flip | Backward workspace sector reach |
+| **N U B, 0, 0, 0** | Back / Bottom | Up | Non-flip | Backward elbow up |
+| **F D B, 0, 0, 0** | Back / Bottom | Down | Flip | Backward reach, elbow down |
+| **N D B, 0, 0, 0** | Back / Bottom | Down | Non-flip | Backward low profile |
+
+Users can click any configuration pill to smoothly interpolate the physical arm between solutions using dynamic shortest-path joint interpolation.
 
 ---
 
-### 4. Learning & Educational Features
-* **6 इंटरैक्टिव गाइडेड लेसन्स**:
-  1. **Degrees of Freedom (DOF)**: 3D स्पेस में 6 DOFs क्यों ज़रूरी हैं।
-  2. **Forward Kinematics (FK)**: जॉइंट एंगल्स से टूल पोजीशन निकालने का मैथमैटिकल फॉर्मूला।
-  3. **Denavit-Hartenberg (DH) Convention**: $\theta, d, a, \alpha$ पैरामीटर्स का कॉन्सेप्ट।
-  4. **Inverse Kinematics & 8 Configurations**: Flip/No-Flip, Up/Down, Top/Bottom का विवरण।
-  5. **Kinematic Singularities**: सिंगुलैरिटी क्या होती है और इससे रोबोट क्यों रुकते हैं।
-  6. **Motion Planning (MOVEJ vs MOVEL)**: जॉइंट-स्पेस PTP बनाम कार्टेशियन लिनियर मोशन।
-* प्रत्येक लेसन में "Demonstrate in 3D" बटन दिया गया है जो सीधे रोबोट आर्म को संबंधित पोज़ में ले जाता है।
+### 3. Geometric Jacobian & Singularity Analysis
+The velocity kinematics relation maps joint rates $\dot{\mathbf{q}} \in \mathbb{R}^6$ to task-space linear velocity $\mathbf{v}$ and angular velocity $\boldsymbol{\omega}$:
+
+$$
+\begin{bmatrix} \mathbf{v} \\ \boldsymbol{\omega} \end{bmatrix} = J(\mathbf{q}) \dot{\mathbf{q}} = \begin{bmatrix} J_v(\mathbf{q}) \\ J_\omega(\mathbf{q}) \end{bmatrix} \dot{\mathbf{q}}
+$$
+
+For revolute joints, each column $i$ of the geometric Jacobian $J_i$ is computed from link transformation history:
+
+$$
+J_i = \begin{bmatrix} \mathbf{z}_{i-1} \times (\mathbf{p}_e - \mathbf{p}_{i-1}) \\ \mathbf{z}_{i-1} \end{bmatrix}
+$$
+
+#### Singularity Diagnostics & Manipulability:
+Kinematic singularities occur when $\det(J) \to 0$, causing loss of instantaneous degrees of freedom and infinite joint velocities for finite Cartesian velocities. The platform continuously monitors:
+- **Wrist Singularity**: Alignment of axes 4 and 6 ($\theta_5 \to 0$).
+- **Elbow Singularity**: Full extension or folding of Link 2 and Link 3 ($\theta_3 \to 0 \text{ or } \pm 180^\circ$).
+- **Shoulder Singularity**: Wrist center crossing the $J_1$ azimuth rotation axis.
+- **Yoshikawa's Manipulability Index**:
+  $$\mu(\mathbf{q}) = \sqrt{\det(J(\mathbf{q}) J^T(\mathbf{q}))}$$
+  Displayed live in the HUD with automated color-coded alerts (`Nominal`, `Warning`, `Singular`).
 
 ---
 
-### 5. Trajectory Planning & Pick-and-Place Automation
-* **वेपॉइंट रिकॉर्डर**: किसी भी पोज़ को वेपॉइंट लिस्ट में रिकॉर्ड करें।
-* **मोशन टाइप**: `MOVEJ` (Joint Space Interpolation) या `MOVEL` (Linear Cartesian Interpolation)।
-* **3D टूलपाथ ट्रेसिंग**: एंड-इफेक्टर का 3D मोशन पाथ हवा में ड्रा होता है।
-* **फंक्शनल न्यूमेटिक ग्रिपर**:
-  * ग्रिपर ओपन / क्लोज स्लाइडर
-  * टेबल पर रखे ब्लॉक्स (Red Cube, Cyan Pin) को फिजिकली पिक और प्लेस करने का डेमो।
+## 🤖 Supported Manipulator Profiles
+
+The simulator provides parameterized kinematic definitions, standard DH parameters, payload capacities, and maximum joint velocity specs:
+
+| Robot Manipulator | Kinematic Type | Reach (mm) | Payload | Repeatability | Weight |
+|---|---|---|---|---|---|
+| **Fanuc CRX-10iA** | 6-DOF Collaborative | 1249 mm | 10 kg | $\pm 0.04$ mm | 40 kg |
+| **Universal Robots UR5e** | 6-DOF Collaborative | 850 mm | 5 kg | $\pm 0.03$ mm | 20.6 kg |
+| **KUKA KR6 R900 (Agilus)** | 6-DOF High-Speed Industrial | 901 mm | 6 kg | $\pm 0.02$ mm | 52 kg |
+| **Unimation PUMA 560** | 6-DOF Classic Academic Standard | 878 mm | 4 kg | $\pm 0.10$ mm | 53 kg |
 
 ---
 
-### 6. Multi-Language Code Generator
-वर्तमान रोबोट पोज़ और काइनेमेटिक्स के लिए रेडी-टू-रन कोड जनरेट करता है:
-* **Python**: `numpy` आधारित फॉरवर्ड काइनेमेटिक्स स्क्रिप्ट
-* **FANUC Karel / TP**: ओरिजिनल टीच पेंडेंट प्रोग्राम (`J P[1] 100% FINE`, `L P[2] 250mm/sec FINE`)
-* **C++ (ROS 2 / MoveIt)**: `move_group_interface` जॉइंट गोल कोड
-* **MATLAB**: Robotics System Toolbox स्क्रिप्ट
-* **JSON**: पोर्टेबल पोज़ एक्सपोर्ट
-
----
-
-## 📂 Project Directory Structure
+## 🛠️ System Architecture
 
 ```
-c:\Ankit Satnami\Projects\Robotic Arm simulator\
-│
-├── index.html              # मुख्य यूजर इंटरफ़ेस और 3D कैनवास
-├── start_simulator.bat     # 1-क्लिक लोकल सर्वर लॉन्चर
-├── server.ps1              # लाइटवेट पॉवरशेल HTTP सर्वर
-├── README.md               # डाक्यूमेंटेशन और गाइड
-│
+Robotic_arm_simulator/
+├── index.html            # Core WebGL 3D Simulator application
+├── README.md             # Research documentation & technical reference
+├── LICENSE               # MIT Open-Source License
 ├── css/
-│   └── style.css           # इंडस्ट्रियल डार्क-थीम स्टाइलिंग और लेआउट
-│
-└── js/
-    ├── kinematics.js       # FK, 8-Solution Analytical IK, DH & Jacobian Engine
-    ├── robot-model.js      # 3D PBR मेष, ग्रिपर, जॉइंट्स और वर्कस्पेस एनवायरनमेंट
-    ├── trajectory.js       # वेपॉइंट्स, MOVEJ/MOVEL और पिक-एंड-प्लेस सीक्वेंसर
-    ├── learning.js         # 6 इंटरैक्टिव लेसन्स और मल्टी-लैंग्वेज कोड जनरेटर
-    └── main.js             # थ्री.जेएस सीन, इवेंट लिसनर्स और ऑर्केस्ट्रेशन
+│   └── style.css         # Responsive dark industrial UI theme
+├── js/
+│   ├── kinematics.js     # DH transformation engine, 8-solution IK & Jacobian
+│   ├── robot-model.js    # Procedural PBR robot geometries, joints & gripper
+│   ├── trajectory.js     # MOVEJ / MOVEL motion interpolator & sequencer
+│   ├── learning.js       # Interactive curricula & code generator
+│   ├── main.js           # Three.js orchestrator & DOM event dispatcher
+│   ├── three.min.js      # Three.js 3D library (bundled)
+│   ├── OrbitControls.js  # Camera navigation controls
+│   └── gsap.min.js       # Smooth tweening and interpolation engine
+├── server.ps1            # Local HTTP server script (PowerShell)
+└── start_simulator.bat   # Local execution launcher
 ```
+
+---
+
+## 💻 Multi-Platform Code Synthesis
+
+The platform features an automated code generation engine that converts the active simulation state into deployable controller scripts:
+
+* **Python (NumPy / SciPy)**: Analytic forward kinematics and transformation matrix validation scripts.
+* **FANUC Karel / Teach Pendant (TP)**: Native industrial controller position registers (`PR[1]`) with config flags.
+* **C++ (ROS 2 MoveIt 2)**: Standard ROS 2 geometry messages (`geometry_msgs::msg::PoseStamped`) and trajectory waypoints.
+* **MATLAB Robotics System Toolbox**: RigidBodyTree definitions and kinematics validation functions.
+
+---
+
+## 🌐 Deployment & Access
+
+### Online Web Access
+The project is continuously deployed to GitHub Pages and mirrored for global access:
+* **GitHub Pages**: [https://ankitsatnami.github.io/Robotic_arm_simulator/](https://ankitsatnami.github.io/Robotic_arm_simulator/)
+* **Cloud Mirror**: [https://eight-kitchen-mngsz.ship.place/](https://eight-kitchen-mngsz.ship.place/)
+
+### Local Execution
+To run locally, clone the repository and launch any local web server or open `index.html` directly:
+```bash
+git clone https://github.com/Ankitsatnami/Robotic_arm_simulator.git
+cd Robotic_arm_simulator
+```
+Using Python:
+```bash
+python -m http.server 8080
+```
+Or using Node.js:
+```bash
+npx serve .
+```
+
+---
+
+## 👤 Author & Credit
+
+- **Creator & Lead Developer**: **Ankit Satnami**
+- **GitHub Profile**: [@Ankitsatnami](https://github.com/Ankitsatnami)
+- **Repository**: [https://github.com/Ankitsatnami/Robotic_arm_simulator](https://github.com/Ankitsatnami/Robotic_arm_simulator)
+
+---
+
+## 📖 Citation
+
+If you use this simulator or its kinematic algorithms for academic coursework, research, or development, please cite it as:
+
+```bibtex
+@misc{satnami2026fanucplayground,
+  author = {Satnami, Ankit},
+  title = {Fanuc Cobot Kinematics Playground: A Real-Time 6-DOF Robotic Arm Simulation & Kinematics Research Platform},
+  year = {2026},
+  publisher = {GitHub},
+  howpublished = {\url{https://github.com/Ankitsatnami/Robotic_arm_simulator}}
+}
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE) &copy; 2026 **Ankit Satnami**.
