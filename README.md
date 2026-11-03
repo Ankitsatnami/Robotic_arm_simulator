@@ -25,7 +25,7 @@
 
 ## 🌟 Key Features (मुख्य विशेषताएं)
 
-### 1. Visual Interface (बिल्कुल स्क्रीनशॉट के अनुसार)
+### 1. Visual Interface 
 * **Fanuc CRX-10iA Cobot Aesthetic**: ग्लॉसी वाइट एरोडायनामिक आर्म्स, सिग्नेचर ग्रीन एक्सेंट रिंग्स, मेटैलिक जॉइंट्स और सॉफ्ट शैडोज़।
 * **Robot Model Selector**: 
   * Fanuc CRX-10iA (Standard Cobot)
