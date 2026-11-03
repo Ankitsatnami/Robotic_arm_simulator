@@ -1,0 +1,4058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fanuc Cobot Kinematics Playground | 6-DOF Web Simulator</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+<style>
+/* ============================================================
+   ROBOTIC ARM KINEMATICS PLAYGROUND - INDUSTRIAL STYLESHEET
+   ============================================================ */
+
+:root {
+    --bg-main: #0b0d13;
+    --bg-panel: #12151e;
+    --bg-card: #181d2a;
+    --bg-card-hover: #1f2537;
+    --bg-input: #0e1118;
+    --border-color: #272f42;
+    --border-focus: #00b4d8;
+    
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    
+    --accent-blue: #0ea5e9;
+    --accent-cyan: #06b6d4;
+    --accent-green: #10b981;
+    --accent-orange: #f59e0b;
+    --accent-red: #ef4444;
+    --accent-purple: #8b5cf6;
+
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    
+    --sidebar-width: 360px;
+    --drawer-height: 290px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* APP SHELL */
+#app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    position: relative;
+}
+
+/* TOP NAVBAR */
+#top-bar {
+    height: 48px;
+    background: rgba(18, 21, 30, 0.95);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    z-index: 50;
+}
+
+.brand-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-icon {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-green));
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.4);
+}
+
+.brand-icon svg {
+    width: 18px;
+    height: 18px;
+    fill: #000;
+}
+
+.brand-title {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.brand-badge {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--accent-green);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+
+.top-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    height: 32px;
+    padding: 0 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.nav-btn:hover {
+    background: var(--bg-card-hover);
+    color: #fff;
+    border-color: var(--text-muted);
+}
+
+.nav-btn.active {
+    background: rgba(14, 165, 233, 0.2);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+}
+
+/* MAIN WORKSPACE LAYOUT */
+#workspace {
+    display: flex;
+    flex: 1;
+    height: calc(100vh - 48px);
+    position: relative;
+    overflow: hidden;
+}
+
+/* LEFT CONTROLS SIDEBAR */
+#controls-sidebar {
+    width: var(--sidebar-width);
+    background: var(--bg-panel);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    z-index: 20;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+}
+
+#controls-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+#controls-sidebar::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+.sidebar-section {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* ROBOT MODEL SELECTOR */
+.model-select-wrapper {
+    position: relative;
+}
+
+.custom-select {
+    width: 100%;
+    height: 36px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 0 12px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+}
+
+.custom-select:focus {
+    border-color: var(--border-focus);
+}
+
+/* JOINT CONTROLS */
+.joint-row {
+    margin-bottom: 12px;
+}
+
+.joint-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-size: 12px;
+}
+
+.joint-name {
+    font-weight: 600;
+    color: #fff;
+    width: 24px;
+}
+
+.joint-value-display {
+    font-family: var(--font-mono);
+    color: var(--accent-cyan);
+    font-size: 12px;
+    font-weight: 600;
+    width: 50px;
+    text-align: right;
+}
+
+.joint-slider-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.joint-step-btn {
+    width: 22px;
+    height: 22px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.joint-step-btn:hover {
+    background: var(--bg-card-hover);
+    color: #fff;
+}
+
+/* RANGE INPUT */
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1;
+    height: 5px;
+    background: #252c3c;
+    border-radius: 3px;
+    outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--accent-cyan);
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(6, 182, 212, 0.6);
+    transition: transform 0.1s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+/* CARTESIAN TARGET GRID */
+.cartesian-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.cart-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 6px 8px;
+}
+
+.cart-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+}
+
+.cart-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    outline: none;
+}
+
+/* CONFIGURATION STRINGS */
+.config-banner {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.config-text {
+    font-family: var(--font-mono);
+    color: var(--accent-cyan);
+    font-weight: 600;
+}
+
+/* AVAILABLE SOLUTIONS PILLS */
+.solutions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+}
+
+.sol-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 7px 4px;
+    border-radius: 14px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.sol-btn:hover {
+    border-color: var(--text-muted);
+    color: #fff;
+    background: var(--bg-card-hover);
+}
+
+.sol-btn.active {
+    background: #0ea5e9;
+    border-color: #38bdf8;
+    color: #fff;
+    box-shadow: 0 0 10px rgba(14, 165, 233, 0.4);
+}
+
+/* QUICK ACTION BUTTONS */
+.action-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.primary-btn {
+    background: linear-gradient(135deg, var(--accent-blue), #0284c7);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    height: 34px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.15s ease;
+}
+
+.primary-btn:hover {
+    filter: brightness(1.15);
+}
+
+.secondary-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    border-radius: 6px;
+    height: 34px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.secondary-btn:hover {
+    background: var(--bg-card-hover);
+    color: #fff;
+}
+
+/* GRIPPER SECTION */
+.gripper-control-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.toggle-switch {
+    display: flex;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 2px;
+}
+
+.toggle-opt {
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text-secondary);
+}
+
+.toggle-opt.active {
+    background: var(--accent-cyan);
+    color: #000;
+}
+
+/* VIEWPORT CONTAINER */
+#viewport-container {
+    flex: 1;
+    position: relative;
+    background: #0a0c10;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#canvas-wrapper {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+#canvas-3d {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+    outline: none;
+}
+
+/* VIEWPORT FLOATING HUD */
+.viewport-hud {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 10;
+}
+
+.hud-pill-group {
+    background: rgba(18, 21, 30, 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 4px;
+    display: flex;
+    gap: 4px;
+}
+
+.hud-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.hud-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.hud-btn.active {
+    background: var(--accent-blue);
+    color: #fff;
+}
+
+/* SINGULARITY HUD ALERT */
+.singularity-hud {
+    position: absolute;
+    top: 12px;
+    left: 16px;
+    background: rgba(18, 21, 30, 0.9);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    backdrop-filter: blur(8px);
+    z-index: 10;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent-green);
+    box-shadow: 0 0 8px var(--accent-green);
+}
+
+.status-dot.warning {
+    background: var(--accent-orange);
+    box-shadow: 0 0 8px var(--accent-orange);
+}
+
+.status-dot.danger {
+    background: var(--accent-red);
+    box-shadow: 0 0 8px var(--accent-red);
+}
+
+/* BOTTOM DRAWER / DETAILS TABS */
+#bottom-drawer {
+    background: var(--bg-panel);
+    border-top: 1px solid var(--border-color);
+    height: var(--drawer-height);
+    display: flex;
+    flex-direction: column;
+    z-index: 15;
+    transition: height 0.2s ease;
+}
+
+#bottom-drawer.collapsed {
+    height: 38px;
+}
+
+.drawer-header {
+    height: 38px;
+    background: rgba(18, 21, 30, 0.95);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+}
+
+.drawer-tabs {
+    display: flex;
+    gap: 4px;
+}
+
+.drawer-tab {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.drawer-tab:hover {
+    color: #fff;
+}
+
+.drawer-tab.active {
+    background: var(--bg-card);
+    color: var(--accent-cyan);
+    border-bottom: 2px solid var(--accent-cyan);
+}
+
+.drawer-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.drawer-content-pane {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: none;
+}
+
+.drawer-content-pane.active {
+    display: block;
+}
+
+/* LIVE MATRIX TAB STYLES */
+.matrix-container-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1.8fr;
+    gap: 16px;
+}
+
+.matrix-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 14px;
+}
+
+.matrix-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.matrix-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: 11px;
+}
+
+.matrix-table td {
+    border: 1px solid #232a3b;
+    padding: 6px 8px;
+    text-align: right;
+    color: #e2e8f0;
+}
+
+.matrix-table td.pos-col {
+    color: var(--accent-green);
+    background: rgba(16, 185, 129, 0.05);
+}
+
+.matrix-table td.rot-col {
+    color: #38bdf8;
+}
+
+/* JACOBIAN MATRIX DISPLAY */
+.jacobian-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 4px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+}
+
+.jac-cell {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    padding: 4px 2px;
+    text-align: center;
+    border-radius: 4px;
+    color: #cbd5e1;
+}
+
+/* DEGREE OF FREEDOM TABLE */
+.dof-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.dof-table th {
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.dof-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(39, 47, 66, 0.5);
+    color: #e2e8f0;
+}
+
+.dof-badge {
+    background: rgba(6, 182, 212, 0.15);
+    color: var(--accent-cyan);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+}
+
+/* LEARNING CURRICULUM */
+.lessons-list {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 16px;
+    height: 100%;
+}
+
+.lesson-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.lesson-nav-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 10px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s ease;
+}
+
+.lesson-nav-item:hover {
+    border-color: var(--accent-cyan);
+}
+
+.lesson-nav-item.active {
+    background: rgba(6, 182, 212, 0.15);
+    border-color: var(--accent-cyan);
+}
+
+.lesson-nav-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.lesson-nav-desc {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.lesson-body {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    overflow-y: auto;
+}
+
+.lesson-body h4 {
+    color: #fff;
+    font-size: 15px;
+    margin-bottom: 8px;
+}
+
+.lesson-body p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+.learning-callout {
+    background: rgba(14, 165, 233, 0.1);
+    border-left: 3px solid var(--accent-blue);
+    padding: 10px 14px;
+    border-radius: 0 6px 6px 0;
+    font-size: 12px;
+    color: #e0f2fe;
+    margin-bottom: 12px;
+}
+
+.learning-callout ul {
+    margin-left: 18px;
+    margin-top: 6px;
+}
+
+.dh-mini-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    margin: 10px 0;
+}
+
+.dh-mini-table th, .dh-mini-table td {
+    border: 1px solid var(--border-color);
+    padding: 6px 10px;
+}
+
+.dh-mini-table th {
+    background: var(--bg-input);
+    color: var(--accent-cyan);
+}
+
+/* WAYPOINT TRAJECTORY LIST */
+.trajectory-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.waypoint-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    font-family: var(--font-mono);
+}
+
+.waypoint-table th {
+    background: var(--bg-card);
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border-color);
+    text-align: left;
+    color: var(--text-muted);
+}
+
+.waypoint-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #1f2536;
+}
+
+.waypoint-row.active {
+    background: rgba(6, 182, 212, 0.15);
+}
+
+/* CODE GENERATOR */
+.code-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: 100%;
+}
+
+.code-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.code-output {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 12px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: #38bdf8;
+    height: 170px;
+    overflow-y: auto;
+    white-space: pre;
+}
+
+/* MODAL DIALOG */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.modal-dialog {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    width: 600px;
+    max-width: 90vw;
+    padding: 24px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.modal-close {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.modal-close:hover {
+    color: #fff;
+}
+
+</style>
+</head>
+<body>
+<div id="app-container">
+        <!-- TOP NAVBAR -->
+        <header id="top-bar">
+            <div class="brand-section">
+                <div class="brand-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="brand-title">
+                    Fanuc Cobot Kinematics Playground
+                    <span class="brand-badge">PRO SIMULATOR</span>
+                </div>
+            </div>
+
+            <div class="top-actions">
+                <button class="nav-btn" id="btn-info" title="Simulator Info & Shortcuts">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                    Help & Docs
+                </button>
+                <a href="https://github.com" target="_blank" class="nav-btn" title="GitHub Repository">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                </a>
+            </div>
+        </header>
+
+        <!-- MAIN WORKSPACE -->
+        <main id="workspace">
+            <!-- LEFT CONTROLS SIDEBAR -->
+            <aside id="controls-sidebar">
+                <!-- ROBOT MODEL -->
+                <div class="sidebar-section">
+                    <div class="section-label">Robot Model</div>
+                    <div class="model-select-wrapper">
+                        <select id="model-select" class="custom-select">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- JOINT CONTROLS -->
+                <div class="sidebar-section">
+                    <div class="section-label">
+                        <span>Joint Controls (6-DOF)</span>
+                        <button id="btn-screenshot-pose" class="joint-step-btn" title="Match uploaded screenshot pose (-62Â°, 26Â°, 78Â°, 69Â°, -68Â°, 75Â°)" style="width:auto; padding:2px 8px; font-size:10px;">
+                            Screenshot Pose
+                        </button>
+                    </div>
+
+                    <!-- J1 -->
+                    <div class="joint-row">
+                        <div class="joint-header">
+                            <span class="joint-name">J1</span>
+                            <div class="joint-slider-container">
+                                <button class="joint-step-btn" id="btn-dec-j1">-</button>
+                                <input type="range" id="slider-j1" min="-180" max="180" value="-62">
+                                <button class="joint-step-btn" id="btn-inc-j1">+</button>
+                            </div>
+                            <span class="joint-value-display" id="val-j1">-62Â°</span>
+                        </div>
+                    </div>
+
+                    <!-- J2 -->
+                    <div class="joint-row">
+                        <div class="joint-header">
+                            <span class="joint-name">J2</span>
+                            <div class="joint-slider-container">
+                                <button class="joint-step-btn" id="btn-dec-j2">-</button>
+                                <input type="range" id="slider-j2" min="-180" max="180" value="26">
+                                <button class="joint-step-btn" id="btn-inc-j2">+</button>
+                            </div>
+                            <span class="joint-value-display" id="val-j2">26Â°</span>
+                        </div>
+                    </div>
+
+                    <!-- J3 -->
+                    <div class="joint-row">
+                        <div class="joint-header">
+                            <span class="joint-name">J3</span>
+                            <div class="joint-slider-container">
+                                <button class="joint-step-btn" id="btn-dec-j3">-</button>
+                                <input type="range" id="slider-j3" min="-180" max="180" value="78">
+                                <button class="joint-step-btn" id="btn-inc-j3">+</button>
+                            </div>
+                            <span class="joint-value-display" id="val-j3">78Â°</span>
+                        </div>
+                    </div>
+
+                    <!-- J4 -->
+                    <div class="joint-row">
+                        <div class="joint-header">
+                            <span class="joint-name">J4</span>
+                            <div class="joint-slider-container">
+                                <button class="joint-step-btn" id="btn-dec-j4">-</button>
+                                <input type="range" id="slider-j4" min="-190" max="190" value="69">
+                                <button class="joint-step-btn" id="btn-inc-j4">+</button>
+                            </div>
+                            <span class="joint-value-display" id="val-j4">69Â°</span>
+                        </div>
+                    </div>
+
+                    <!-- J5 -->
+                    <div class="joint-row">
+                        <div class="joint-header">
+                            <span class="joint-name">J5</span>
+                            <div class="joint-slider-container">
+                                <button class="joint-step-btn" id="btn-dec-j5">-</button>
+                                <input type="range" id="slider-j5" min="-180" max="180" value="-68">
+                                <button class="joint-step-btn" id="btn-inc-j5">+</button>
+                            </div>
+                            <span class="joint-value-display" id="val-j5">-68Â°</span>
+                        </div>
+                    </div>
+
+                    <!-- J6 -->
+                    <div class="joint-row">
+                        <div class="joint-header">
+                            <span class="joint-name">J6</span>
+                            <div class="joint-slider-container">
+                                <button class="joint-step-btn" id="btn-dec-j6">-</button>
+                                <input type="range" id="slider-j6" min="-225" max="225" value="75">
+                                <button class="joint-step-btn" id="btn-inc-j6">+</button>
+                            </div>
+                            <span class="joint-value-display" id="val-j6">75Â°</span>
+                        </div>
+                    </div>
+
+                    <!-- QUICK POSES -->
+                    <div class="action-grid" style="margin-top:12px;">
+                        <button class="secondary-btn" id="btn-zero">Zero (0Â°)</button>
+                        <button class="secondary-btn" id="btn-home">Home Pose</button>
+                        <button class="secondary-btn" id="btn-ready">Ready Pose</button>
+                    </div>
+                </div>
+
+                <!-- CARTESIAN TARGET -->
+                <div class="sidebar-section">
+                    <div class="section-label">Cartesian Target (mm / deg)</div>
+                    
+                    <div class="cartesian-grid">
+                        <div class="cart-card">
+                            <div class="cart-label">X (mm)</div>
+                            <input type="number" step="1" id="input-x" class="cart-input" value="-42.34">
+                        </div>
+                        <div class="cart-card">
+                            <div class="cart-label">Y (mm)</div>
+                            <input type="number" step="1" id="input-y" class="cart-input" value="-330.37">
+                        </div>
+                        <div class="cart-card">
+                            <div class="cart-label">Z (mm)</div>
+                            <input type="number" step="1" id="input-z" class="cart-input" value="1091.36">
+                        </div>
+                        <div class="cart-card">
+                            <div class="cart-label">W (Yaw Â°)</div>
+                            <input type="number" step="1" id="input-w" class="cart-input" value="72.51">
+                        </div>
+                        <div class="cart-card">
+                            <div class="cart-label">P (Pitch Â°)</div>
+                            <input type="number" step="1" id="input-p" class="cart-input" value="-2.77">
+                        </div>
+                        <div class="cart-card">
+                            <div class="cart-label">R (Roll Â°)</div>
+                            <input type="number" step="1" id="input-r" class="cart-input" value="-36.88">
+                        </div>
+                    </div>
+
+                    <div class="config-banner">
+                        <span id="current-config-display" class="config-text">Current Config: N D T, 0, 0, 0</span>
+                    </div>
+
+                    <button class="primary-btn" id="btn-solve-ik" style="width:100%;">
+                        Solve Inverse Kinematics (IK)
+                    </button>
+                </div>
+
+                <!-- AVAILABLE SOLUTIONS (8 CONFIGURATIONS) -->
+                <div class="sidebar-section">
+                    <div class="section-label">Available Solutions (Analytical IK)</div>
+                    <div class="solutions-grid">
+                        <button class="sol-btn" data-config="F D T">F D T, 0, 0, 0</button>
+                        <button class="sol-btn active" data-config="N D T">N D T, 0, 0, 0</button>
+                        <button class="sol-btn" data-config="F U T">F U T, 0, 0, 0</button>
+                        <button class="sol-btn" data-config="N U T">N U T, 0, 0, 0</button>
+                        <button class="sol-btn" data-config="F U B">F U B, 0, 0, 0</button>
+                        <button class="sol-btn" data-config="N U B">N U B, 0, 0, 0</button>
+                        <button class="sol-btn" data-config="F D B">F D B, 0, 0, 0</button>
+                        <button class="sol-btn" data-config="N D B">N D B, 0, 0, 0</button>
+                    </div>
+                </div>
+
+                <!-- END-EFFECTOR GRIPPER -->
+                <div class="sidebar-section">
+                    <div class="section-label">Pneumatic Gripper & Physics</div>
+                    <div class="gripper-control-box">
+                        <div class="toggle-switch">
+                            <div class="toggle-opt active" id="btn-grip-open">Open</div>
+                            <div class="toggle-opt" id="btn-grip-close">Close</div>
+                        </div>
+                        <input type="range" id="gripper-slider" min="0" max="100" value="80" style="flex:1;">
+                        <button class="joint-step-btn" id="btn-reset-objects" title="Reset table blocks" style="width:auto; padding:0 8px;">
+                            Reset Blocks
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- 3D VIEWPORT -->
+            <section id="viewport-container">
+                <!-- Dedicated Canvas Viewport Wrapper -->
+                <div id="canvas-wrapper">
+                    <canvas id="canvas-3d"></canvas>
+                </div>
+
+                <!-- TOP-LEFT SINGULARITY STATUS HUD -->
+                <div class="singularity-hud">
+                    <div class="status-dot" id="singularity-status-dot"></div>
+                    <div id="singularity-status-text" style="font-weight:600;">KINEMATICS NOMINAL</div>
+                </div>
+
+                <!-- TOP-RIGHT CAMERA & OVERLAY HUD -->
+                <div class="viewport-hud">
+                    <!-- CAMERA VIEWS -->
+                    <div class="hud-pill-group">
+                        <button class="hud-btn" id="btn-view-persp">Persp</button>
+                        <button class="hud-btn" id="btn-view-top">Top</button>
+                        <button class="hud-btn" id="btn-view-front">Front</button>
+                        <button class="hud-btn" id="btn-view-side">Side</button>
+                    </div>
+
+                    <!-- OVERLAY TOGGLES -->
+                    <div class="hud-pill-group">
+                        <button class="hud-btn active" id="btn-toggle-axes" title="Joint Rotation Axes">Axes</button>
+                        <button class="hud-btn active" id="btn-toggle-frames" title="Coordinate Frames">Frames</button>
+                        <button class="hud-btn" id="btn-toggle-cloud" title="Workspace Envelope Cloud">Cloud</button>
+                    </div>
+                </div>
+
+                <!-- BOTTOM DETAILS & LEARNING DRAWER -->
+                <div id="bottom-drawer" class="collapsed">
+                    <div class="drawer-header">
+                        <div class="drawer-tabs">
+                            <button class="drawer-tab" data-target="pane-matrix">Live Matrix Details</button>
+                            <button class="drawer-tab" data-target="pane-dof">Degree of Freedoms Detail</button>
+                            <button class="drawer-tab" data-target="pane-learning">Learning & Theory</button>
+                            <button class="drawer-tab" data-target="pane-trajectory">Trajectory Sequencer</button>
+                            <button class="drawer-tab" data-target="pane-code">Code Generator</button>
+                        </div>
+                        <div class="drawer-actions">
+                            <button class="nav-btn" id="btn-toggle-drawer" style="height:26px; font-size:11px;">
+                                â–² Expand Details Panel
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 1. LIVE MATRIX PANE -->
+                    <div class="drawer-content-pane active" id="pane-matrix">
+                        <div class="matrix-container-grid">
+                            <!-- 4x4 HOMOGENEOUS MATRIX -->
+                            <div class="matrix-card">
+                                <div class="matrix-title">
+                                    <span>Homogeneous Transform Matrix [Tâ‚€â¶] (Forward Kinematics)</span>
+                                    <span id="mat-summary-pos" style="color:var(--accent-green); font-family:var(--font-mono); font-size:11px;"></span>
+                                </div>
+                                <table class="matrix-table">
+                                    <tbody id="live-matrix-body">
+                                        <!-- Live 4x4 rows inserted dynamically -->
+                                    </tbody>
+                                </table>
+                                <div style="margin-top:10px; font-size:11px; color:var(--text-muted); display:flex; gap:16px;">
+                                    <span><strong style="color:#38bdf8;">â–  Blue:</strong> 3x3 Rotation [R]</span>
+                                    <span><strong style="color:var(--accent-green);">â–  Green:</strong> Position Vector [P]</span>
+                                </div>
+                            </div>
+
+                            <!-- 6x6 JACOBIAN & MANIPULABILITY -->
+                            <div class="matrix-card">
+                                <div class="matrix-title">
+                                    <span>Geometric Jacobian Matrix [Jâ‚†â‚“â‚†]</span>
+                                    <span id="jac-manipulability" style="color:var(--accent-cyan); font-family:var(--font-mono); font-size:11px;"></span>
+                                </div>
+                                <div class="jacobian-grid" id="jacobian-cells">
+                                    <!-- 36 Jacobian elements -->
+                                </div>
+                                <div style="margin-top:8px; font-size:11px; color:var(--text-secondary); line-height:1.4;">
+                                    Rows 1â€“3: Linear Velocity Part ($J_v$). Rows 4â€“6: Angular Velocity Part ($J_\omega$). Near zero determinant indicates kinematic singularity.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. DEGREE OF FREEDOM DETAIL PANE -->
+                    <div class="drawer-content-pane" id="pane-dof">
+                        <table class="dof-table">
+                            <thead>
+                                <tr>
+                                    <th>Joint</th>
+                                    <th>Name</th>
+                                    <th>Joint Type</th>
+                                    <th>Motion Axis</th>
+                                    <th>Range Limit</th>
+                                    <th>Max Speed</th>
+                                    <th>Current Value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dof-table-body">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 3. LEARNING & THEORY PANE -->
+                    <div class="drawer-content-pane" id="pane-learning">
+                        <div class="lessons-list">
+                            <div class="lesson-nav" id="lesson-nav-list">
+                                <!-- Populated dynamically -->
+                            </div>
+                            <div class="lesson-body" id="lesson-body-pane">
+                                <!-- Lesson content -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. TRAJECTORY SEQUENCER PANE -->
+                    <div class="drawer-content-pane" id="pane-trajectory">
+                        <div class="trajectory-toolbar">
+                            <button class="primary-btn" id="btn-traj-play" style="padding:0 14px;">â–¶ Play Path</button>
+                            <button class="secondary-btn" id="btn-traj-pause">Pause</button>
+                            <button class="secondary-btn" id="btn-traj-stop">Stop</button>
+                            <button class="secondary-btn" id="btn-traj-loop">Loop: OFF</button>
+                            
+                            <div style="display:flex; align-items:center; gap:8px; margin-left:12px;">
+                                <span style="font-size:11px; color:var(--text-secondary);">Motion Type:</span>
+                                <select id="motion-type-select" class="custom-select" style="width:130px; height:30px; font-size:11px;">
+                                    <option value="MOVEJ">MOVEJ (Joint Space)</option>
+                                    <option value="MOVEL">MOVEL (Linear Line)</option>
+                                </select>
+                            </div>
+
+                            <div style="display:flex; align-items:center; gap:8px; margin-left:12px;">
+                                <span style="font-size:11px; color:var(--text-secondary);">Speed:</span>
+                                <input type="range" id="traj-speed-slider" min="10" max="100" value="50" style="width:100px;">
+                                <span id="traj-speed-val" style="font-size:11px; font-family:var(--font-mono); color:var(--accent-cyan);">50%</span>
+                            </div>
+
+                            <button class="secondary-btn" id="btn-add-waypoint" style="margin-left:auto;">+ Record Current Pose</button>
+                            <button class="secondary-btn" id="btn-clear-trace">Clear 3D Line</button>
+                        </div>
+
+                        <table class="waypoint-table">
+                            <thead>
+                                <tr>
+                                    <th>Waypoint</th>
+                                    <th>Joints [J1...J6]</th>
+                                    <th>Gripper</th>
+                                    <th>Speed</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="waypoint-table-body">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 5. CODE GENERATOR PANE -->
+                    <div class="drawer-content-pane" id="pane-code">
+                        <div class="code-container">
+                            <div class="code-toolbar">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <span style="font-size:12px; font-weight:600; color:var(--text-secondary);">Target Language:</span>
+                                    <select id="code-lang-select" class="custom-select" style="width:180px; height:30px; font-size:12px;">
+                                        <option value="python">Python (NumPy / Kinematics)</option>
+                                        <option value="fanuc">FANUC Karel / TP Script</option>
+                                        <option value="cpp">C++ (ROS 2 MoveIt)</option>
+                                        <option value="matlab">MATLAB Robotics Toolbox</option>
+                                        <option value="json">JSON Kinematics Pose</option>
+                                    </select>
+                                </div>
+                                <button class="primary-btn" id="btn-copy-code" style="padding:0 16px;">Copy Code</button>
+                            </div>
+                            <pre class="code-output" id="code-output-block"></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- INFO & SHORTCUTS MODAL -->
+    <div class="modal-overlay" id="info-modal" style="display:none;">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <div class="modal-title">Robotic Arm Kinematics Playground - Help & Guide</div>
+                <button class="modal-close" id="btn-close-modal">&times;</button>
+            </div>
+            <div style="font-size:13px; line-height:1.6; color:var(--text-secondary);">
+                <p>Welcome to the <strong>Fanuc Cobot Kinematics Playground</strong>. This simulator provides comprehensive 6-DOF kinematics modeling, real-time DH transformation matrices, and analytical inverse kinematics solutions.</p>
+                
+                <h5 style="color:#fff; margin:12px 0 6px 0;">3D Viewport Navigation:</h5>
+                <ul style="margin-left:20px;">
+                    <li><strong>Rotate / Orbit:</strong> Click and drag with Left Mouse Button.</li>
+                    <li><strong>Pan / Move:</strong> Right-click and drag (or Shift + Left Click drag).</li>
+                    <li><strong>Zoom:</strong> Mouse Scroll Wheel.</li>
+                </ul>
+
+                <h5 style="color:#fff; margin:12px 0 6px 0;">Key Capabilities:</h5>
+                <ul style="margin-left:20px;">
+                    <li><strong>8 Analytical IK Configurations:</strong> Test Flip/No-flip, Elbow Up/Down, Shoulder Front/Back solutions.</li>
+                    <li><strong>Live Matrix Breakdown:</strong> Inspect $[T_0^6]$ and $6\times6$ Jacobian $[J]$ with real-time singularity diagnostics.</li>
+                    <li><strong>Interactive Lessons:</strong> Step-by-step guides on DOF, DH convention, and singularities.</li>
+                    <li><strong>Multi-Language Code Generation:</strong> Export real robot controller code in Python, C++, Fanuc TP, and MATLAB.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+        <!-- CORE 3D LIBRARIES (Cloudflare CDN + Unpkg Fallback) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+if (typeof THREE === "undefined") {
+    document.write('<script src="https://unpkg.com/three@0.128.0/build/three.min.js"><\/script>');
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+if (typeof THREE !== "undefined" && !THREE.OrbitControls) {
+    document.write('<script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"><\/script>');
+}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/katex/0.16.8/katex.min.js" onerror="console.warn('Katex optional')"></script>
+<!-- INLINE CUSTOM ROBOTICS & SIMULATOR ENGINES -->
+<script>
+/**
+ * Kinematics Engine for 6-DOF Robotic Manipulators
+ * Supports Forward Kinematics (FK), Closed-Form Analytical 8-Solution Inverse Kinematics (IK),
+ * Denavit-Hartenberg (DH) Matrix Pipeline, Geometric Jacobian (6x6), Singularity Diagnostics,
+ * and Manipulability Analysis.
+ */
+
+class KinematicsEngine {
+    constructor() {
+        // Robot models specifications with standard DH parameters: [theta, d (mm), a (mm), alpha (rad)]
+        this.robotProfiles = {
+            'CRX-10iA': {
+                name: 'Fanuc CRX-10iA (Standard)',
+                type: 'Cobot 6-DOF',
+                reach: 1249, // mm
+                payload: '10 kg',
+                repeatability: '±0.04 mm',
+                weight: '40 kg',
+                // Physical link lengths in millimeters
+                dh: [
+                    { name: 'J1', d: 245.0, a: 0.0,   alpha: Math.PI / 2,  min: -180, max: 180, speed: 120 },
+                    { name: 'J2', d: 0.0,   a: 710.0, alpha: 0.0,          min: -180, max: 180, speed: 120 },
+                    { name: 'J3', d: 0.0,   a: 0.0,   alpha: Math.PI / 2,  min: -180, max: 180, speed: 180 },
+                    { name: 'J4', d: 540.0, a: 0.0,   alpha: -Math.PI / 2, min: -190, max: 190, speed: 180 },
+                    { name: 'J5', d: 0.0,   a: 0.0,   alpha: Math.PI / 2,  min: -180, max: 180, speed: 180 },
+                    { name: 'J6', d: 160.0, a: 0.0,   alpha: 0.0,          min: -225, max: 225, speed: 220 }
+                ],
+                home: [0, 0, 0, 0, 0, 0],
+                ready: [0, 20, 60, 0, -80, 0],
+                colorTheme: {
+                    body: 0xf3f4f6,      // Clean glossy white cobot
+                    accent: 0x10b981,    // Fanuc CRX green rings
+                    joints: 0x1f2937,    // Dark metallic charcoal
+                    effector: 0x111827   // Tool flange
+                }
+            },
+            'UR5e': {
+                name: 'Universal Robots UR5e',
+                type: 'Collaborative 6-DOF',
+                reach: 850,
+                payload: '5 kg',
+                repeatability: '±0.03 mm',
+                weight: '20.6 kg',
+                dh: [
+                    { name: 'J1', d: 162.5, a: 0.0,    alpha: Math.PI / 2,  min: -360, max: 360, speed: 180 },
+                    { name: 'J2', d: 0.0,   a: -425.0, alpha: 0.0,          min: -360, max: 360, speed: 180 },
+                    { name: 'J3', d: 0.0,   a: -392.2, alpha: 0.0,          min: -360, max: 360, speed: 180 },
+                    { name: 'J4', d: 133.3, a: 0.0,    alpha: Math.PI / 2,  min: -360, max: 360, speed: 180 },
+                    { name: 'J5', d: 99.7,  a: 0.0,    alpha: -Math.PI / 2, min: -360, max: 360, speed: 180 },
+                    { name: 'J6', d: 99.6,  a: 0.0,    alpha: 0.0,          min: -360, max: 360, speed: 180 }
+                ],
+                home: [0, 0, 0, 0, 0, 0],
+                ready: [0, -45, 90, -45, 90, 0],
+                colorTheme: {
+                    body: 0xc8cdd0,
+                    accent: 0x0284c7,
+                    joints: 0x334155,
+                    effector: 0x0f172a
+                }
+            },
+            'KUKA-KR6': {
+                name: 'KUKA KR6 R900 (Agilus)',
+                type: 'Industrial 6-DOF',
+                reach: 901,
+                payload: '6 kg',
+                repeatability: '±0.02 mm',
+                weight: '52 kg',
+                dh: [
+                    { name: 'J1', d: 400.0, a: 25.0,  alpha: -Math.PI / 2, min: -170, max: 170, speed: 360 },
+                    { name: 'J2', d: 0.0,   a: 455.0, alpha: 0.0,          min: -190, max: 45,  speed: 300 },
+                    { name: 'J3', d: 0.0,   a: 35.0,  alpha: Math.PI / 2,  min: -120, max: 156, speed: 360 },
+                    { name: 'J4', d: 420.0, a: 0.0,   alpha: -Math.PI / 2, min: -185, max: 185, speed: 381 },
+                    { name: 'J5', d: 0.0,   a: 0.0,   alpha: Math.PI / 2,  min: -120, max: 120, speed: 388 },
+                    { name: 'J6', d: 80.0,  a: 0.0,   alpha: 0.0,          min: -350, max: 350, speed: 615 }
+                ],
+                home: [0, 0, 0, 0, 0, 0],
+                ready: [0, -30, 80, 0, 40, 0],
+                colorTheme: {
+                    body: 0xea580c,      // KUKA iconic industrial orange
+                    accent: 0x1e293b,
+                    joints: 0x0f172a,
+                    effector: 0x334155
+                }
+            },
+            'PUMA-560': {
+                name: 'Unimation PUMA 560 (Classic)',
+                type: 'Academic Standard 6-DOF',
+                reach: 878,
+                payload: '4 kg',
+                repeatability: '±0.1 mm',
+                weight: '53 kg',
+                dh: [
+                    { name: 'J1', d: 671.8, a: 0.0,   alpha: -Math.PI / 2, min: -160, max: 160, speed: 100 },
+                    { name: 'J2', d: 0.0,   a: 431.8, alpha: 0.0,          min: -225, max: 45,  speed: 100 },
+                    { name: 'J3', d: 150.05,a: -20.3, alpha: Math.PI / 2,  min: -45,  max: 225, speed: 100 },
+                    { name: 'J4', d: 433.1, a: 0.0,   alpha: -Math.PI / 2, min: -110, max: 170, speed: 150 },
+                    { name: 'J5', d: 0.0,   a: 0.0,   alpha: Math.PI / 2,  min: -100, max: 100, speed: 150 },
+                    { name: 'J6', d: 56.5,  a: 0.0,   alpha: 0.0,          min: -266, max: 266, speed: 200 }
+                ],
+                home: [0, 0, 0, 0, 0, 0],
+                ready: [0, -45, 90, 0, 45, 0],
+                colorTheme: {
+                    body: 0xfacc15,      // Classic yellow
+                    accent: 0x1f2937,
+                    joints: 0x374151,
+                    effector: 0x111827
+                }
+            }
+        };
+
+        this.currentModelKey = 'CRX-10iA';
+    }
+
+    getModel() {
+        return this.robotProfiles[this.currentModelKey];
+    }
+
+    setModel(key) {
+        if (this.robotProfiles[key]) {
+            this.currentModelKey = key;
+            return true;
+        }
+        return false;
+    }
+
+    degToRad(deg) {
+        return (deg * Math.PI) / 180;
+    }
+
+    radToDeg(rad) {
+        return (rad * 180) / Math.PI;
+    }
+
+    /**
+     * Compute individual DH Transformation Matrix A_i for Link i
+     * Standard Denavit-Hartenberg matrix:
+     * RotZ(theta) * TransZ(d) * TransX(a) * RotX(alpha)
+     */
+    getDHMatrix(thetaRad, d, a, alphaRad) {
+        const ct = Math.cos(thetaRad);
+        const st = Math.sin(thetaRad);
+        const ca = Math.cos(alphaRad);
+        const sa = Math.sin(alphaRad);
+
+        return [
+            [ct, -st * ca,  st * sa, a * ct],
+            [st,  ct * ca, -ct * sa, a * st],
+            [0,   sa,       ca,      d],
+            [0,   0,        0,       1]
+        ];
+    }
+
+    /**
+     * Multiply two 4x4 matrices M1 * M2
+     */
+    multiplyMatrices(M1, M2) {
+        const result = [
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0]
+        ];
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 4; j++) {
+                let sum = 0;
+                for (let k = 0; k < 4; k++) {
+                    sum += M1[i][k] * M2[k][j];
+                }
+                result[i][j] = sum;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Forward Kinematics (FK)
+     * Joint angles in degrees: [j1, j2, j3, j4, j5, j6]
+     * Returns:
+     * - cumulativeMatrices: array of T_0^i for each link i (0 to 6)
+     * - linkMatrices: individual A_i matrices
+     * - cartesian: { x, y, z, w, p, r }
+     * - T06: 4x4 matrix
+     */
+    forwardKinematics(jointAnglesDeg) {
+        const model = this.getModel();
+        const dh = model.dh;
+
+        const linkMatrices = [];
+        const cumulativeMatrices = [];
+
+        // Base frame T_0^0 = Identity
+        let currentT = [
+            [1, 0, 0, 0],
+            [0, 1, 0, 0],
+            [0, 0, 1, 0],
+            [0, 0, 0, 1]
+        ];
+        cumulativeMatrices.push(JSON.parse(JSON.stringify(currentT)));
+
+        for (let i = 0; i < 6; i++) {
+            const thetaRad = this.degToRad(jointAnglesDeg[i]);
+            const Ai = this.getDHMatrix(thetaRad, dh[i].d, dh[i].a, dh[i].alpha);
+            linkMatrices.push(Ai);
+            currentT = this.multiplyMatrices(currentT, Ai);
+            cumulativeMatrices.push(JSON.parse(JSON.stringify(currentT)));
+        }
+
+        const T06 = currentT;
+        const x = T06[0][3];
+        const y = T06[1][3];
+        const z = T06[2][3];
+
+        // Extract Fanuc W-P-R (Euler angles: Yaw about Z, Pitch about Y, Roll about X, or standard XYZ)
+        // Fanuc WPR is:
+        // R = Rz(w) * Ry(p) * Rx(r) (W=Yaw/Z, P=Pitch/Y, R=Roll/X)
+        const R = [
+            [T06[0][0], T06[0][1], T06[0][2]],
+            [T06[1][0], T06[1][1], T06[1][2]],
+            [T06[2][0], T06[2][1], T06[2][2]]
+        ];
+
+        let p_pitch = Math.atan2(-R[2][0], Math.hypot(R[0][0], R[1][0]));
+        let w_yaw = 0;
+        let r_roll = 0;
+
+        if (Math.abs(Math.cos(p_pitch)) > 1e-5) {
+            w_yaw = Math.atan2(R[1][0], R[0][0]);
+            r_roll = Math.atan2(R[2][1], R[2][2]);
+        } else {
+            // Gimbal lock
+            w_yaw = Math.atan2(-R[0][1], R[1][1]);
+            r_roll = 0;
+        }
+
+        return {
+            cumulativeMatrices,
+            linkMatrices,
+            T06,
+            cartesian: {
+                x: Number(x.toFixed(2)),
+                y: Number(y.toFixed(2)),
+                z: Number(z.toFixed(2)),
+                w: Number(this.radToDeg(w_yaw).toFixed(2)),
+                p: Number(this.radToDeg(p_pitch).toFixed(2)),
+                r: Number(this.radToDeg(r_roll).toFixed(2))
+            },
+            config: this.determineConfiguration(jointAnglesDeg)
+        };
+    }
+
+    /**
+     * Determine Fanuc-style configuration flags:
+     * - Flip (F) vs Non-flip (N): Joint 5 sign (N: J5 >= 0, F: J5 < 0)
+     * - Up (U) vs Down (D): Elbow configuration (D: J3 downward, U: J3 upward)
+     * - Top (T) vs Bottom (B): Shoulder front/back
+     * - Turn numbers: full revolutions for J1, J4, J6 (usually 0, 0, 0)
+     */
+    determineConfiguration(joints) {
+        const [j1, j2, j3, j4, j5, j6] = joints;
+
+        const flip = j5 <= 0 ? 'N' : 'F';
+        const elbow = j3 >= 0 ? 'D' : 'U';
+        const shoulder = j2 >= -45 ? 'T' : 'B';
+
+        const turn1 = Math.floor((j1 + 180) / 360);
+        const turn4 = Math.floor((j4 + 180) / 360);
+        const turn6 = Math.floor((j6 + 180) / 360);
+
+        const configKey = `${flip} ${elbow} ${shoulder}`;
+        const fullString = `${configKey}, ${turn1}, ${turn4}, ${turn6}`;
+
+        return {
+            flip,
+            elbow,
+            shoulder,
+            configKey,
+            fullString
+        };
+    }
+
+    /**
+     * Create Rotation matrix from Fanuc W-P-R Euler angles (in degrees)
+     * R = Rz(W) * Ry(P) * Rx(R)
+     */
+    wprToRotationMatrix(wDeg, pDeg, rDeg) {
+        const w = this.degToRad(wDeg);
+        const p = this.degToRad(pDeg);
+        const r = this.degToRad(rDeg);
+
+        const cw = Math.cos(w), sw = Math.sin(w);
+        const cp = Math.cos(p), sp = Math.sin(p);
+        const cr = Math.cos(r), sr = Math.sin(r);
+
+        return [
+            [
+                cw * cp,
+                cw * sp * sr - sw * cr,
+                cw * sp * cr + sw * sr
+            ],
+            [
+                sw * cp,
+                sw * sp * sr + cw * cr,
+                sw * sp * cr - cw * sr
+            ],
+            [
+                -sp,
+                cp * sr,
+                cp * cr
+            ]
+        ];
+    }
+
+    /**
+     * Analytical Inverse Kinematics (IK) for 6-DOF Spherical Wrist Robot (CRX-10iA style)
+     * Computes all 8 configuration solutions:
+     * Configurations:
+     * - F D T, 0, 0, 0
+     * - N D T, 0, 0, 0
+     * - F U T, 0, 0, 0
+     * - N U T, 0, 0, 0
+     * - F U B, 0, 0, 0
+     * - N U B, 0, 0, 0
+     * - F D B, 0, 0, 0
+     * - N D B, 0, 0, 0
+     */
+    inverseKinematicsAllSolutions(target) {
+        const model = this.getModel();
+        const dh = model.dh;
+        const d1 = dh[0].d;
+        const a2 = dh[1].a !== 0 ? Math.abs(dh[1].a) : 710.0;
+        const a3 = dh[2].a !== 0 ? Math.abs(dh[2].a) : 0.0;
+        const d4 = dh[3].d !== 0 ? Math.abs(dh[3].d) : 540.0;
+        const d6 = dh[5].d !== 0 ? Math.abs(dh[5].d) : 160.0;
+
+        const { x, y, z, w, p, r } = target;
+        const R06 = this.wprToRotationMatrix(w, p, r);
+
+        // Tool vector (Z-axis of end-effector frame, column 2)
+        const ax = R06[0][2];
+        const ay = R06[1][2];
+        const az = R06[2][2];
+
+        // Step 1: Wrist Center Position P_w = P_ee - d6 * a
+        const Pwx = x - d6 * ax;
+        const Pwy = y - d6 * ay;
+        const Pwz = z - d6 * az;
+
+        const solutions = [];
+
+        // Shoulder configurations: Top/Front vs Bottom/Back (or Forward vs Backward)
+        const shoulderCases = [
+            { flag: 'T', offset: 0 },
+            { flag: 'B', offset: Math.PI }
+        ];
+
+        // Elbow configurations: Down vs Up
+        const elbowCases = [
+            { flag: 'D', sign: 1 },
+            { flag: 'U', sign: -1 }
+        ];
+
+        // Wrist configurations: Non-flip vs Flip
+        const wristCases = [
+            { flag: 'N', flip: false },
+            { flag: 'F', flip: true }
+        ];
+
+        for (const sCase of shoulderCases) {
+            // Joint 1: Base angle
+            let theta1Base = Math.atan2(Pwy, Pwx);
+            let theta1 = theta1Base + sCase.offset;
+
+            // Normalize theta1 into [-PI, PI]
+            theta1 = Math.atan2(Math.sin(theta1), Math.cos(theta1));
+
+            // Planar reach for J2-J3
+            const r_xy = Math.hypot(Pwx, Pwy) * (sCase.flag === 'T' ? 1 : -1);
+            const r_z = Pwz - d1;
+            const D_sq = r_xy * r_xy + r_z * r_z;
+            const D = Math.sqrt(D_sq);
+
+            // Effective link 2 and link 3
+            const L2 = a2;
+            const L3 = Math.hypot(a3, d4);
+
+            // Reachability check
+            if (D > L2 + L3 || D < Math.abs(L2 - L3)) {
+                // Point unreachable, skip or clamp
+                continue;
+            }
+
+            // Law of cosines for elbow angle
+            const cosBeta = (L2 * L2 + L3 * L3 - D_sq) / (2 * L2 * L3);
+            const clampedCosBeta = Math.max(-1, Math.min(1, cosBeta));
+            const beta = Math.acos(clampedCosBeta);
+
+            for (const eCase of elbowCases) {
+                // Joint 3
+                let theta3 = eCase.sign * (Math.PI - beta);
+
+                // Joint 2
+                const alphaTarget = Math.atan2(r_z, r_xy);
+                const cosGamma = (L2 * L2 + D_sq - L3 * L3) / (2 * L2 * D);
+                const clampedCosGamma = Math.max(-1, Math.min(1, cosGamma));
+                const gamma = Math.acos(clampedCosGamma);
+
+                let theta2 = alphaTarget - eCase.sign * gamma;
+
+                // Spherical wrist orientation
+                for (const wCase of wristCases) {
+                    const anglesDeg = [
+                        this.radToDeg(theta1),
+                        this.radToDeg(theta2),
+                        this.radToDeg(theta3),
+                        0, 0, 0
+                    ];
+
+                    // Compute R_0^3
+                    const fk03 = this.forwardKinematics([anglesDeg[0], anglesDeg[1], anglesDeg[2], 0, 0, 0]);
+                    const T03 = fk03.cumulativeMatrices[3];
+
+                    // R_0^3
+                    const R03 = [
+                        [T03[0][0], T03[0][1], T03[0][2]],
+                        [T03[1][0], T03[1][1], T03[1][2]],
+                        [T03[2][0], T03[2][1], T03[2][2]]
+                    ];
+
+                    // R_3^6 = (R_0^3)^T * R_0^6
+                    const R36 = [
+                        [0, 0, 0],
+                        [0, 0, 0],
+                        [0, 0, 0]
+                    ];
+
+                    for (let row = 0; row < 3; row++) {
+                        for (let col = 0; col < 3; col++) {
+                            let sum = 0;
+                            for (let k = 0; k < 3; k++) {
+                                sum += R03[k][row] * R06[k][col];
+                            }
+                            R36[row][col] = sum;
+                        }
+                    }
+
+                    // Extract Euler Z-Y-Z for spherical wrist J4, J5, J6 from R36
+                    let theta5, theta4, theta6;
+
+                    // cos(theta5) = R36[2][2]
+                    const cos5 = Math.max(-1, Math.min(1, R36[2][2]));
+                    if (wCase.flip) {
+                        theta5 = -Math.acos(cos5);
+                    } else {
+                        theta5 = Math.acos(cos5);
+                    }
+
+                    if (Math.abs(Math.sin(theta5)) > 1e-4) {
+                        theta4 = Math.atan2(R36[1][2] / Math.sin(theta5), R36[0][2] / Math.sin(theta5));
+                        theta6 = Math.atan2(R36[2][1] / Math.sin(theta5), -R36[2][0] / Math.sin(theta5));
+                    } else {
+                        // Singularity (theta5 close to 0)
+                        theta4 = 0;
+                        theta6 = Math.atan2(-R36[0][1], R36[0][0]);
+                    }
+
+                    // Normalize angles to degrees
+                    const sol = [
+                        this.normalizeDeg(this.radToDeg(theta1)),
+                        this.normalizeDeg(this.radToDeg(theta2)),
+                        this.normalizeDeg(this.radToDeg(theta3)),
+                        this.normalizeDeg(this.radToDeg(theta4)),
+                        this.normalizeDeg(this.radToDeg(theta5)),
+                        this.normalizeDeg(this.radToDeg(theta6))
+                    ];
+
+                    const configName = `${wCase.flag} ${eCase.flag} ${sCase.flag}, 0, 0, 0`;
+
+                    solutions.push({
+                        configName,
+                        configCode: `${wCase.flag} ${eCase.flag} ${sCase.flag}`,
+                        flip: wCase.flag,
+                        elbow: eCase.flag,
+                        shoulder: sCase.flag,
+                        joints: sol.map(v => Number(v.toFixed(1))),
+                        valid: this.checkJointLimits(sol)
+                    });
+                }
+            }
+        }
+
+        return solutions;
+    }
+
+    normalizeDeg(deg) {
+        let d = deg % 360;
+        if (d > 180) d -= 360;
+        if (d < -180) d += 360;
+        return d;
+    }
+
+    checkJointLimits(joints) {
+        const model = this.getModel();
+        for (let i = 0; i < 6; i++) {
+            if (joints[i] < model.dh[i].min || joints[i] > model.dh[i].max) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Geometric Jacobian Matrix (6x6)
+     * J = [ J_v ] (3x6 linear velocity)
+     *     [ J_w ] (3x6 angular velocity)
+     * For revolute joint i:
+     * J_v,i = z_{i-1} x (p_e - p_{i-1})
+     * J_w,i = z_{i-1}
+     */
+    computeJacobian(jointAnglesDeg) {
+        const fk = this.forwardKinematics(jointAnglesDeg);
+        const T = fk.cumulativeMatrices;
+
+        const Pe = [T[6][0][3], T[6][1][3], T[6][2][3]];
+
+        const J = [
+            [0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0]
+        ];
+
+        for (let i = 0; i < 6; i++) {
+            // z_{i-1} is column 2 of rotation matrix T[i]
+            const z = [T[i][0][2], T[i][1][2], T[i][2][2]];
+            // p_{i-1} is column 3 of T[i]
+            const p = [T[i][0][3], T[i][1][3], T[i][2][3]];
+
+            // r = p_e - p_{i-1}
+            const rx = Pe[0] - p[0];
+            const ry = Pe[1] - p[1];
+            const rz = Pe[2] - p[2];
+
+            // J_v = z x r
+            const Jvx = z[1] * rz - z[2] * ry;
+            const Jvy = z[2] * rx - z[0] * rz;
+            const Jvz = z[0] * ry - z[1] * rx;
+
+            // Fill columns
+            J[0][i] = Jvx / 1000.0; // convert mm to meters for normalized scaling
+            J[1][i] = Jvy / 1000.0;
+            J[2][i] = Jvz / 1000.0;
+            J[3][i] = z[0];
+            J[4][i] = z[1];
+            J[5][i] = z[2];
+        }
+
+        // Calculate Manipulability index (Yoshikawa measure) = sqrt(det(J * J^T))
+        const JJT = this.multiplyMatrixWithTranspose(J);
+        const detJJT = this.determinant6x6(JJT);
+        const manipulability = Math.sqrt(Math.max(0, detJJT));
+
+        // Singularity condition detection
+        const j5 = Math.abs(jointAnglesDeg[4]);
+        const isWristSingularity = j5 < 5.0 || Math.abs(j5 - 180) < 5.0;
+
+        const shoulderReach = Math.hypot(Pe[0], Pe[1]);
+        const isShoulderSingularity = shoulderReach < 80.0;
+
+        const maxReach = this.getModel().reach;
+        const totalDist = Math.hypot(Pe[0], Pe[1], Pe[2] - this.getModel().dh[0].d);
+        const isBoundarySingularity = Math.abs(totalDist - maxReach) < 40.0;
+
+        return {
+            matrix: J,
+            manipulability: Number(manipulability.toFixed(4)),
+            isSingular: manipulability < 0.005 || isWristSingularity || isShoulderSingularity || isBoundarySingularity,
+            singularities: {
+                wrist: isWristSingularity,
+                shoulder: isShoulderSingularity,
+                boundary: isBoundarySingularity
+            }
+        };
+    }
+
+    multiplyMatrixWithTranspose(A) {
+        const rows = A.length;
+        const cols = A[0].length;
+        const result = Array(rows).fill(0).map(() => Array(rows).fill(0));
+
+        for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < rows; j++) {
+                let sum = 0;
+                for (let k = 0; k < cols; k++) {
+                    sum += A[i][k] * A[j][k];
+                }
+                result[i][j] = sum;
+            }
+        }
+        return result;
+    }
+
+    determinant6x6(M) {
+        // LU decomposition determinant calculation
+        const n = 6;
+        const A = M.map(row => [...row]);
+        let det = 1;
+
+        for (let i = 0; i < n; i++) {
+            let pivot = i;
+            for (let j = i + 1; j < n; j++) {
+                if (Math.abs(A[j][i]) > Math.abs(A[pivot][i])) {
+                    pivot = j;
+                }
+            }
+
+            if (Math.abs(A[pivot][i]) < 1e-12) {
+                return 0;
+            }
+
+            if (pivot !== i) {
+                [A[i], A[pivot]] = [A[pivot], A[i]];
+                det = -det;
+            }
+
+            det *= A[i][i];
+
+            for (let j = i + 1; j < n; j++) {
+                const factor = A[j][i] / A[i][i];
+                for (let k = i + 1; k < n; k++) {
+                    A[j][k] -= factor * A[i][k];
+                }
+            }
+        }
+
+        return det;
+    }
+}
+
+// Global instance for browser consumption
+window.KinematicsEngine = KinematicsEngine;
+
+</script>
+<script>
+/**
+ * Procedural 3D Robotic Arm Builder & Scene Entities
+ * Generates ultra-high-fidelity PBR models of Fanuc CRX-10iA Cobot, UR5e, KUKA, etc.
+ * Features realistic articulated joint hierarchies, pneumatic gripper fingers,
+ * coordinate frame gizmos, joint rotation rings, and interactive graspable objects.
+ */
+
+class Robot3DModel {
+    constructor(scene, kinematics) {
+        this.scene = scene;
+        this.kinematics = kinematics;
+        this.rootGroup = new THREE.Group();
+        this.scene.add(this.rootGroup);
+
+        // Joint object nodes
+        this.jointNodes = [];
+        this.linkMeshes = [];
+        this.axisHelpers = [];
+        this.frameHelpers = [];
+        this.gripperFingers = [];
+        this.gripperOpenDistance = 45; // mm
+        this.gripperState = 0.8; // 0 = closed, 1 = fully open
+
+        // Interactive Pick & Place items
+        this.graspableObjects = [];
+        this.graspedObject = null;
+
+        // Visual flags
+        this.showJointAxes = true;
+        this.showFrames = true;
+        this.showTCPFrame = true;
+        this.showWorkspaceCloud = false;
+        this.workspaceCloud = null;
+
+        this.initMaterials();
+        this.buildRobot();
+        this.buildTableAndEnvironment();
+        this.buildGraspableObjects();
+    }
+
+    initMaterials() {
+        const model = this.kinematics.getModel();
+        const colors = model.colorTheme;
+
+        // High-Vibrancy PBR Materials so robot shines in all viewports
+        this.materials = {
+            body: new THREE.MeshStandardMaterial({
+                color: 0xf8fafc,       // Crisp Fanuc Cobot White
+                roughness: 0.18,
+                metalness: 0.08
+            }),
+            accent: new THREE.MeshStandardMaterial({
+                color: 0x10b981,       // Vibrant Fanuc CRX Signature Green
+                roughness: 0.2,
+                metalness: 0.15,
+                emissive: 0x10b981,
+                emissiveIntensity: 0.3
+            }),
+            joints: new THREE.MeshStandardMaterial({
+                color: 0x334155,       // Elegant Slate Charcoal
+                roughness: 0.35,
+                metalness: 0.5
+            }),
+            darkMetal: new THREE.MeshStandardMaterial({
+                color: 0x475569,       // Brushed Steel / Aluminum
+                roughness: 0.3,
+                metalness: 0.65
+            }),
+            chrome: new THREE.MeshStandardMaterial({
+                color: 0xf1f5f9,
+                roughness: 0.1,
+                metalness: 0.95
+            }),
+            gripperBody: new THREE.MeshStandardMaterial({
+                color: 0x334155,
+                roughness: 0.35,
+                metalness: 0.6
+            }),
+            gripperFinger: new THREE.MeshStandardMaterial({
+                color: 0x06b6d4,       // Cyan Grip Pads
+                roughness: 0.25,
+                metalness: 0.2,
+                emissive: 0x06b6d4,
+                emissiveIntensity: 0.25
+            }),
+            table: new THREE.MeshStandardMaterial({
+                color: 0x1e222d,       // Matte Dark Worktable
+                roughness: 0.7,
+                metalness: 0.2
+            }),
+            targetPad: new THREE.MeshStandardMaterial({
+                color: 0x10b981,
+                transparent: true,
+                opacity: 0.35,
+                roughness: 0.5
+            })
+        };
+    }
+
+    /**
+     * Build the 6-DOF Articulated Arm matching Fanuc CRX-10iA aesthetic
+     */
+    buildRobot() {
+        // Clear previous meshes if any
+        while (this.rootGroup.children.length > 0) {
+            this.rootGroup.remove(this.rootGroup.children[0]);
+        }
+
+        this.jointNodes = [];
+        this.linkMeshes = [];
+        this.axisHelpers = [];
+        this.frameHelpers = [];
+
+        const model = this.kinematics.getModel();
+        const dh = model.dh;
+
+        // Scale factor: visual models scaled to meters (1 Three.js unit = 1000 mm)
+        const scale = 0.001;
+
+        // 1. BASE PEDESTAL (Fixed to ground)
+        const baseGroup = new THREE.Group();
+        this.rootGroup.add(baseGroup);
+
+        // Mounting flange (Charcoal dark base matching screenshot)
+        const baseFlangeGeo = new THREE.CylinderGeometry(0.13, 0.14, 0.04, 48);
+        const baseFlange = new THREE.Mesh(baseFlangeGeo, this.materials.joints);
+        baseFlange.position.y = 0.04 / 2;
+        baseFlange.castShadow = true;
+        baseFlange.receiveShadow = true;
+        baseGroup.add(baseFlange);
+
+        // Green base accent ring
+        const baseRingGeo = new THREE.CylinderGeometry(0.128, 0.128, 0.015, 48);
+        const baseRing = new THREE.Mesh(baseRingGeo, this.materials.accent);
+        baseRing.position.y = 0.04 + 0.015 / 2;
+        baseGroup.add(baseRing);
+
+        // Base connector side box with dual silver pins (matching screenshot)
+        const connBoxGeo = new THREE.BoxGeometry(0.04, 0.03, 0.05);
+        const connBox = new THREE.Mesh(connBoxGeo, this.materials.joints);
+        connBox.position.set(0.14, 0.02, 0);
+        baseGroup.add(connBox);
+
+        const pinGeo = new THREE.CylinderGeometry(0.005, 0.005, 0.035, 16);
+        pinGeo.rotateZ(Math.PI / 2);
+        const pin1 = new THREE.Mesh(pinGeo, this.materials.chrome);
+        pin1.position.set(0.165, 0.022, 0.012);
+        baseGroup.add(pin1);
+        const pin2 = new THREE.Mesh(pinGeo, this.materials.chrome);
+        pin2.position.set(0.165, 0.022, -0.012);
+        baseGroup.add(pin2);
+
+        // Base riser cylinder
+        const baseRiserHeight = (dh[0].d * scale) - 0.05;
+        const baseRiserGeo = new THREE.CylinderGeometry(0.115, 0.12, baseRiserHeight, 48);
+        const baseRiser = new THREE.Mesh(baseRiserGeo, this.materials.body);
+        baseRiser.position.y = 0.05 + baseRiserHeight / 2;
+        baseRiser.castShadow = true;
+        baseGroup.add(baseRiser);
+
+        // JOINT 1 (Yaw: Z-axis rotation)
+        const j1Node = new THREE.Group();
+        j1Node.position.y = dh[0].d * scale;
+        baseGroup.add(j1Node);
+        this.jointNodes.push(j1Node);
+
+        // J1 Shoulder Turret Housing
+        const shoulderTurretGeo = new THREE.CylinderGeometry(0.11, 0.115, 0.14, 48);
+        const shoulderTurret = new THREE.Mesh(shoulderTurretGeo, this.materials.body);
+        shoulderTurret.castShadow = true;
+        j1Node.add(shoulderTurret);
+
+        // Shoulder cross-axis connector (horizontal hub for J2)
+        const shoulderHubGeo = new THREE.CylinderGeometry(0.095, 0.095, 0.18, 36);
+        shoulderHubGeo.rotateZ(Math.PI / 2);
+        const shoulderHub = new THREE.Mesh(shoulderHubGeo, this.materials.joints);
+        shoulderHub.position.set(0.05, 0.06, 0);
+        shoulderHub.castShadow = true;
+        j1Node.add(shoulderHub);
+
+        // JOINT 2 (Shoulder Pitch: Y/Z-axis in Three.js)
+        const j2Node = new THREE.Group();
+        j2Node.position.set(0, 0.06, 0);
+        j1Node.add(j2Node);
+        this.jointNodes.push(j2Node);
+
+        // Link 2: Upper Arm (Long slender aerodynamic white limb)
+        const a2Len = (dh[1].a !== 0 ? Math.abs(dh[1].a) : 710) * scale;
+        const upperArmGroup = new THREE.Group();
+        j2Node.add(upperArmGroup);
+
+        const upperArmCylGeo = new THREE.CylinderGeometry(0.08, 0.085, a2Len - 0.1, 40);
+        const upperArmCyl = new THREE.Mesh(upperArmCylGeo, this.materials.body);
+        upperArmCyl.position.y = a2Len / 2;
+        upperArmCyl.castShadow = true;
+        upperArmGroup.add(upperArmCyl);
+
+        // Green styling stripe down upper arm
+        const stripeGeo = new THREE.BoxGeometry(0.015, a2Len * 0.7, 0.17);
+        const stripe = new THREE.Mesh(stripeGeo, this.materials.accent);
+        stripe.position.y = a2Len / 2;
+        upperArmGroup.add(stripe);
+
+        // Shoulder joint cap
+        const shoulderCapGeo = new THREE.CylinderGeometry(0.09, 0.09, 0.02, 36);
+        shoulderCapGeo.rotateZ(Math.PI / 2);
+        const shoulderCap = new THREE.Mesh(shoulderCapGeo, this.materials.accent);
+        shoulderCap.position.set(0.095, 0, 0);
+        upperArmGroup.add(shoulderCap);
+
+        // JOINT 3 (Elbow Pitch)
+        const j3Node = new THREE.Group();
+        j3Node.position.y = a2Len;
+        upperArmGroup.add(j3Node);
+        this.jointNodes.push(j3Node);
+
+        // Elbow housing hub
+        const elbowHubGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.16, 36);
+        elbowHubGeo.rotateZ(Math.PI / 2);
+        const elbowHub = new THREE.Mesh(elbowHubGeo, this.materials.joints);
+        elbowHub.castShadow = true;
+        j3Node.add(elbowHub);
+
+        // Elbow green accent ring
+        const elbowRingGeo = new THREE.CylinderGeometry(0.082, 0.082, 0.02, 36);
+        elbowRingGeo.rotateZ(Math.PI / 2);
+        const elbowRing = new THREE.Mesh(elbowRingGeo, this.materials.accent);
+        j3Node.add(elbowRing);
+
+        // Link 3 & 4: Forearm
+        const d4Len = (dh[3].d !== 0 ? Math.abs(dh[3].d) : 540) * scale;
+        const forearmGroup = new THREE.Group();
+        j3Node.add(forearmGroup);
+
+        const forearmCylGeo = new THREE.CylinderGeometry(0.065, 0.075, d4Len - 0.08, 36);
+        const forearmCyl = new THREE.Mesh(forearmCylGeo, this.materials.body);
+        forearmCyl.position.y = d4Len / 2;
+        forearmCyl.castShadow = true;
+        forearmGroup.add(forearmCyl);
+
+        // JOINT 4 (Forearm Roll: axial rotation)
+        const j4Node = new THREE.Group();
+        j4Node.position.y = d4Len;
+        forearmGroup.add(j4Node);
+        this.jointNodes.push(j4Node);
+
+        // Wrist 1 housing
+        const w1Geo = new THREE.CylinderGeometry(0.062, 0.065, 0.08, 32);
+        const w1Mesh = new THREE.Mesh(w1Geo, this.materials.darkMetal);
+        w1Mesh.castShadow = true;
+        j4Node.add(w1Mesh);
+
+        // JOINT 5 (Wrist Pitch)
+        const j5Node = new THREE.Group();
+        j5Node.position.y = 0.04;
+        j4Node.add(j5Node);
+        this.jointNodes.push(j5Node);
+
+        // Wrist 2 compact pitch joint
+        const w2Geo = new THREE.CylinderGeometry(0.055, 0.055, 0.11, 32);
+        w2Geo.rotateZ(Math.PI / 2);
+        const w2Mesh = new THREE.Mesh(w2Geo, this.materials.joints);
+        w2Mesh.castShadow = true;
+        j5Node.add(w2Mesh);
+
+        const w2RingGeo = new THREE.CylinderGeometry(0.057, 0.057, 0.015, 32);
+        w2RingGeo.rotateZ(Math.PI / 2);
+        const w2Ring = new THREE.Mesh(w2RingGeo, this.materials.accent);
+        j5Node.add(w2Ring);
+
+        // JOINT 6 (Tool Flange Twist / Roll)
+        const d6Len = (dh[5].d !== 0 ? Math.abs(dh[5].d) : 160) * scale;
+        const j6Node = new THREE.Group();
+        j6Node.position.y = 0.05;
+        j5Node.add(j6Node);
+        this.jointNodes.push(j6Node);
+
+        // Tool Flange (ISO standard circular mount)
+        const flangeGeo = new THREE.CylinderGeometry(0.05, 0.05, 0.025, 32);
+        const flangeMesh = new THREE.Mesh(flangeGeo, this.materials.darkMetal);
+        flangeMesh.position.y = 0.025 / 2;
+        flangeMesh.castShadow = true;
+        j6Node.add(flangeMesh);
+
+        // Tool Flange green ring
+        const flangeRingGeo = new THREE.CylinderGeometry(0.052, 0.052, 0.008, 32);
+        const flangeRing = new THREE.Mesh(flangeRingGeo, this.materials.accent);
+        flangeRing.position.y = 0.015;
+        j6Node.add(flangeRing);
+
+        // BUILD PNEUMATIC GRIPPER
+        this.buildGripper(j6Node, 0.025);
+
+        // Visual Axis & Frame Helpers
+        this.buildHelpers();
+    }
+
+    /**
+     * Build two-finger parallel gripper
+     */
+    buildGripper(parent, offsetZ) {
+        this.gripperGroup = new THREE.Group();
+        this.gripperGroup.position.y = offsetZ;
+        parent.add(this.gripperGroup);
+
+        // Gripper actuator body
+        const bodyGeo = new THREE.BoxGeometry(0.09, 0.05, 0.055);
+        const body = new THREE.Mesh(bodyGeo, this.materials.gripperBody);
+        body.position.y = 0.025;
+        body.castShadow = true;
+        this.gripperGroup.add(body);
+
+        // Guide rails
+        const railGeo = new THREE.CylinderGeometry(0.004, 0.004, 0.08, 16);
+        railGeo.rotateZ(Math.PI / 2);
+        const rail = new THREE.Mesh(railGeo, this.materials.chrome);
+        rail.position.y = 0.035;
+        this.gripperGroup.add(rail);
+
+        // Two Finger Mounts
+        this.gripperFingers = [];
+
+        // Left Finger
+        const leftFingerGroup = new THREE.Group();
+        leftFingerGroup.position.set(-0.025, 0.05, 0);
+        this.gripperGroup.add(leftFingerGroup);
+
+        const fingerGeo = new THREE.BoxGeometry(0.012, 0.05, 0.02);
+        const fingerLeft = new THREE.Mesh(fingerGeo, this.materials.darkMetal);
+        fingerLeft.position.y = 0.025;
+        fingerLeft.castShadow = true;
+        leftFingerGroup.add(fingerLeft);
+
+        const padGeo = new THREE.BoxGeometry(0.004, 0.035, 0.018);
+        const padLeft = new THREE.Mesh(padGeo, this.materials.gripperFinger);
+        padLeft.position.set(0.006, 0.028, 0);
+        leftFingerGroup.add(padLeft);
+
+        // Right Finger
+        const rightFingerGroup = new THREE.Group();
+        rightFingerGroup.position.set(0.025, 0.05, 0);
+        this.gripperGroup.add(rightFingerGroup);
+
+        const fingerRight = new THREE.Mesh(fingerGeo, this.materials.darkMetal);
+        fingerRight.position.y = 0.025;
+        fingerRight.castShadow = true;
+        rightFingerGroup.add(fingerRight);
+
+        const padRight = new THREE.Mesh(padGeo, this.materials.gripperFinger);
+        padRight.position.set(-0.006, 0.028, 0);
+        rightFingerGroup.add(padRight);
+
+        this.gripperFingers = [leftFingerGroup, rightFingerGroup];
+
+        // TCP Point (Tool Center Point)
+        this.tcpNode = new THREE.Group();
+        this.tcpNode.position.set(0, 0.085, 0); // TCP at fingertips center
+        this.gripperGroup.add(this.tcpNode);
+
+        // TCP Coordinate Frame
+        const tcpAxes = new THREE.AxesHelper(0.12);
+        this.tcpNode.add(tcpAxes);
+        this.frameHelpers.push(tcpAxes);
+    }
+
+    /**
+     * Animate gripper opening / closing
+     * state: 0 (closed) to 1 (fully open)
+     */
+    setGripperState(state) {
+        this.gripperState = Math.max(0, Math.min(1, state));
+        const halfSpread = (0.008 + this.gripperState * 0.032); // 8mm to 40mm
+
+        if (this.gripperFingers.length === 2) {
+            this.gripperFingers[0].position.x = -halfSpread;
+            this.gripperFingers[1].position.x = halfSpread;
+        }
+
+        // Check object grasping logic
+        this.evaluateGrasping();
+    }
+
+    /**
+     * Coordinate frames & Joint rotation axis indicators
+     */
+    buildHelpers() {
+        this.axisHelpers = [];
+
+        // Add visual rotation rings at each joint
+        const jointAxesConfigs = [
+            { radius: 0.14, color: 0x3b82f6, axis: 'Y' }, // J1
+            { radius: 0.12, color: 0x10b981, axis: 'X' }, // J2
+            { radius: 0.10, color: 0xef4444, axis: 'X' }, // J3
+            { radius: 0.08, color: 0xf59e0b, axis: 'Y' }, // J4
+            { radius: 0.07, color: 0x8b5cf6, axis: 'X' }, // J5
+            { radius: 0.06, color: 0x06b6d4, axis: 'Y' }  // J6
+        ];
+
+        this.jointNodes.forEach((node, idx) => {
+            const conf = jointAxesConfigs[idx];
+            const ringGeo = new THREE.TorusGeometry(conf.radius, 0.003, 16, 48, Math.PI * 1.5);
+            if (conf.axis === 'X') {
+                ringGeo.rotateZ(Math.PI / 2);
+            } else if (conf.axis === 'Z') {
+                ringGeo.rotateX(Math.PI / 2);
+            }
+            const ringMat = new THREE.MeshBasicMaterial({
+                color: conf.color,
+                transparent: true,
+                opacity: 0.8
+            });
+            const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+            node.add(ringMesh);
+            this.axisHelpers.push(ringMesh);
+
+            // Local Coordinate Frame
+            const axes = new THREE.AxesHelper(0.08);
+            node.add(axes);
+            this.frameHelpers.push(axes);
+        });
+
+        this.updateHelperVisibility();
+    }
+
+    updateHelperVisibility() {
+        this.axisHelpers.forEach(h => h.visible = this.showJointAxes);
+        this.frameHelpers.forEach(f => f.visible = this.showFrames);
+    }
+
+    /**
+     * Update 3D joint rotations from degree angles array [j1, j2, j3, j4, j5, j6]
+     */
+    updateJointAngles(jointsDeg) {
+        if (!this.jointNodes || this.jointNodes.length < 6) return;
+
+        const rads = jointsDeg.map(d => (d * Math.PI) / 180);
+
+        // Fanuc CRX kinematics mapping to Three.js Euler axes
+        // Joint 1: Base rotation around Y axis (Three.js vertical)
+        this.jointNodes[0].rotation.y = -rads[0];
+
+        // Joint 2: Shoulder pitch around X axis (pointing upwards)
+        this.jointNodes[1].rotation.x = -rads[1];
+
+        // Joint 3: Elbow pitch around X axis
+        this.jointNodes[2].rotation.x = rads[2];
+
+        // Joint 4: Forearm roll around Y axis
+        this.jointNodes[3].rotation.y = rads[3];
+
+        // Joint 5: Wrist pitch around X axis
+        this.jointNodes[4].rotation.x = -rads[4];
+
+        // Joint 6: Flange roll around Y axis
+        this.jointNodes[5].rotation.y = rads[5];
+
+        // Update grasped item if carrying one
+        if (this.graspedObject) {
+            const tcpWorld = new THREE.Vector3();
+            this.tcpNode.getWorldPosition(tcpWorld);
+            this.graspedObject.position.copy(tcpWorld);
+        }
+    }
+
+    /**
+     * Build Industrial Workspace Environment (Studio Dark Grid matching screenshot)
+     */
+    buildTableAndEnvironment() {
+        const envGroup = new THREE.Group();
+        this.scene.add(envGroup);
+
+        // Ground shadow plane (receives soft robot shadows)
+        const floorGeo = new THREE.PlaneGeometry(10.0, 10.0);
+        floorGeo.rotateX(-Math.PI / 2);
+        const floorMat = new THREE.ShadowMaterial({ opacity: 0.5 });
+        const floor = new THREE.Mesh(floorGeo, floorMat);
+        floor.position.y = -0.001;
+        floor.receiveShadow = true;
+        envGroup.add(floor);
+
+        // Floor Grid with 100mm markings matching screenshot
+        const gridHelper = new THREE.GridHelper(5.0, 50, 0x1e293b, 0x0f172a);
+        gridHelper.position.y = 0;
+        envGroup.add(gridHelper);
+
+        // Ground Target Pick Zone
+        const pickZoneGeo = new THREE.PlaneGeometry(0.2, 0.2);
+        pickZoneGeo.rotateX(-Math.PI / 2);
+        const pickZone = new THREE.Mesh(pickZoneGeo, new THREE.MeshStandardMaterial({
+            color: 0x0284c7,
+            transparent: true,
+            opacity: 0.25
+        }));
+        pickZone.position.set(-0.35, 0.001, 0.35);
+        envGroup.add(pickZone);
+
+        // Ground Target Drop Zone
+        const dropZone = new THREE.Mesh(pickZoneGeo, this.materials.targetPad);
+        dropZone.position.set(0.35, 0.001, 0.35);
+        envGroup.add(dropZone);
+    }
+
+    /**
+     * Graspable sample blocks for Pick & Place interactive simulation
+     */
+    buildGraspableObjects() {
+        this.graspableObjects = [];
+
+        // Red Cube
+        const cubeGeo = new THREE.BoxGeometry(0.045, 0.045, 0.045);
+        const cubeMat = new THREE.MeshStandardMaterial({
+            color: 0xef4444,
+            roughness: 0.3,
+            metalness: 0.2
+        });
+        const cube = new THREE.Mesh(cubeGeo, cubeMat);
+        cube.position.set(-0.35, 0.0225, 0.35);
+        cube.castShadow = true;
+        cube.name = 'Red Block';
+        this.scene.add(cube);
+        this.graspableObjects.push(cube);
+
+        // Cyan Cylinder
+        const cylGeo = new THREE.CylinderGeometry(0.022, 0.022, 0.05, 24);
+        const cylMat = new THREE.MeshStandardMaterial({
+            color: 0x06b6d4,
+            roughness: 0.3,
+            metalness: 0.2
+        });
+        const cyl = new THREE.Mesh(cylGeo, cylMat);
+        cyl.position.set(-0.25, 0.025, 0.35);
+        cyl.castShadow = true;
+        cyl.name = 'Cyan Pin';
+        this.scene.add(cyl);
+        this.graspableObjects.push(cyl);
+    }
+
+    /**
+     * Evaluate magnetic/pneumatic grasp of objects near TCP
+     */
+    evaluateGrasping() {
+        if (!this.tcpNode) return;
+
+        const tcpPos = new THREE.Vector3();
+        this.tcpNode.getWorldPosition(tcpPos);
+
+        if (this.gripperState < 0.35) {
+            // Gripper closed: Try to latch nearby object
+            if (!this.graspedObject) {
+                for (const obj of this.graspableObjects) {
+                    const dist = tcpPos.distanceTo(obj.position);
+                    if (dist < 0.065) {
+                        this.graspedObject = obj;
+                        break;
+                    }
+                }
+            }
+        } else {
+            // Gripper opened: Release object
+            if (this.graspedObject) {
+                // Drop to table surface (y = 0.025)
+                this.graspedObject.position.y = 0.025;
+                this.graspedObject = null;
+            }
+        }
+    }
+
+    /**
+     * Generate 3D Reachable Workspace Envelope Cloud
+     */
+    toggleWorkspaceCloud(visible) {
+        this.showWorkspaceCloud = visible;
+        if (this.workspaceCloud) {
+            this.workspaceCloud.visible = visible;
+            return;
+        }
+
+        if (!visible) return;
+
+        // Generate Monte Carlo point cloud of forward kinematics
+        const count = 4000;
+        const positions = new Float32Array(count * 3);
+        const colors = new Float32Array(count * 3);
+
+        const model = this.kinematics.getModel();
+        const dh = model.dh;
+
+        for (let i = 0; i < count; i++) {
+            // Random joint sample within limits
+            const randomJoints = dh.map(joint => {
+                return joint.min + Math.random() * (joint.max - joint.min);
+            });
+
+            const fk = this.kinematics.forwardKinematics(randomJoints);
+            const x = fk.cartesian.x * 0.001;
+            const y = fk.cartesian.z * 0.001; // Z in robotics is up in Three.js Y
+            const z = -fk.cartesian.y * 0.001;
+
+            positions[i * 3] = x;
+            positions[i * 3 + 1] = y;
+            positions[i * 3 + 2] = z;
+
+            // Gradient color based on reach distance
+            const r = Math.hypot(x, y, z);
+            colors[i * 3] = 0.0;
+            colors[i * 3 + 1] = 0.7 + (r * 0.2);
+            colors[i * 3 + 2] = 0.9;
+        }
+
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        const mat = new THREE.PointsMaterial({
+            size: 0.015,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.4
+        });
+
+        this.workspaceCloud = new THREE.Points(geo, mat);
+        this.scene.add(this.workspaceCloud);
+    }
+
+    resetObjectPositions() {
+        if (this.graspableObjects[0]) {
+            this.graspableObjects[0].position.set(-0.35, 0.0225, 0.45);
+        }
+        if (this.graspableObjects[1]) {
+            this.graspableObjects[1].position.set(-0.25, 0.025, 0.55);
+        }
+        this.graspedObject = null;
+    }
+}
+
+window.Robot3DModel = Robot3DModel;
+
+</script>
+<script>
+/**
+ * Trajectory Planner & Motion Sequencer
+ * Supports Joint Space PTP (MOVEJ), Cartesian Linear Interpolation (MOVEL),
+ * 3D visual toolpath tracing, Waypoint Recording, and Automated Pick & Place demo.
+ */
+
+class TrajectoryPlanner {
+    constructor(kinematics, robotModel, onJointUpdate) {
+        this.kinematics = kinematics;
+        this.robotModel = robotModel;
+        this.onJointUpdate = onJointUpdate;
+
+        this.waypoints = [];
+        this.isPlaying = false;
+        this.isPaused = false;
+        this.isLooping = false;
+        this.motionType = 'MOVEJ'; // 'MOVEJ' or 'MOVEL'
+        this.speedPercent = 50;
+
+        this.currentWaypointIndex = 0;
+        this.progress = 0; // 0 to 1 between waypoints
+        this.activeTrajectoryPath = null;
+
+        // Visual Toolpath Line
+        this.pathPoints = [];
+        this.pathLine = null;
+        this.initVisualPath();
+
+        // Default Pick & Place Program
+        this.loadDefaultProgram();
+    }
+
+    initVisualPath() {
+        const material = new THREE.LineBasicMaterial({
+            color: 0x06b6d4,
+            linewidth: 2,
+            transparent: true,
+            opacity: 0.8
+        });
+        const geometry = new THREE.BufferGeometry();
+        this.pathLine = new THREE.Line(geometry, material);
+        this.robotModel.scene.add(this.pathLine);
+    }
+
+    clearPathTrace() {
+        this.pathPoints = [];
+        this.pathLine.geometry.setFromPoints([]);
+    }
+
+    addPathPoint(vector3) {
+        if (this.pathPoints.length > 500) {
+            this.pathPoints.shift();
+        }
+        this.pathPoints.push(vector3.clone());
+        this.pathLine.geometry.setFromPoints(this.pathPoints);
+    }
+
+    loadDefaultProgram() {
+        // Preset Pick & Place sequence for Fanuc CRX
+        this.waypoints = [
+            {
+                id: 1,
+                name: 'Ready Pose',
+                joints: [0, 20, 60, 0, -80, 0],
+                gripper: 1.0,
+                speed: 60,
+                delay: 200
+            },
+            {
+                id: 2,
+                name: 'Pick Approach',
+                joints: [-52, 38, 55, 0, -85, -52],
+                gripper: 1.0,
+                speed: 50,
+                delay: 100
+            },
+            {
+                id: 3,
+                name: 'Pick Grasp',
+                joints: [-52, 48, 62, 0, -85, -52],
+                gripper: 0.0, // Grab
+                speed: 25,
+                delay: 400
+            },
+            {
+                id: 4,
+                name: 'Pick Retract',
+                joints: [-52, 28, 50, 0, -80, -52],
+                gripper: 0.0,
+                speed: 40,
+                delay: 100
+            },
+            {
+                id: 5,
+                name: 'Drop Approach',
+                joints: [52, 28, 50, 0, -80, 52],
+                gripper: 0.0,
+                speed: 50,
+                delay: 100
+            },
+            {
+                id: 6,
+                name: 'Drop Place',
+                joints: [52, 48, 62, 0, -85, 52],
+                gripper: 1.0, // Release
+                speed: 25,
+                delay: 400
+            },
+            {
+                id: 7,
+                name: 'Return Ready',
+                joints: [0, 20, 60, 0, -80, 0],
+                gripper: 1.0,
+                speed: 60,
+                delay: 200
+            }
+        ];
+    }
+
+    recordCurrentAsWaypoint(currentJoints, currentGripper, name) {
+        const id = this.waypoints.length + 1;
+        this.waypoints.push({
+            id,
+            name: name || `P[${id}] Waypoint`,
+            joints: [...currentJoints],
+            gripper: currentGripper,
+            speed: this.speedPercent,
+            delay: 100
+        });
+        return this.waypoints;
+    }
+
+    removeWaypoint(index) {
+        if (index >= 0 && index < this.waypoints.length) {
+            this.waypoints.splice(index, 1);
+        }
+    }
+
+    play() {
+        if (this.waypoints.length < 2) return;
+        this.isPlaying = true;
+        this.isPaused = false;
+        this.currentWaypointIndex = 0;
+        this.progress = 0;
+        this.clearPathTrace();
+    }
+
+    pause() {
+        this.isPaused = true;
+    }
+
+    resume() {
+        this.isPaused = false;
+    }
+
+    stop() {
+        this.isPlaying = false;
+        this.isPaused = false;
+        this.progress = 0;
+    }
+
+    /**
+     * Smooth Hermite / S-Curve interpolation factor
+     */
+    smoothStep(t) {
+        return t * t * (3 - 2 * t);
+    }
+
+    /**
+     * Update trajectory per animation frame (delta in seconds)
+     */
+    update(deltaSec) {
+        if (!this.isPlaying || this.isPaused || this.waypoints.length < 2) return;
+
+        const pA = this.waypoints[this.currentWaypointIndex];
+        const nextIdx = (this.currentWaypointIndex + 1) % this.waypoints.length;
+        const pB = this.waypoints[nextIdx];
+
+        // Speed calculation based on speed percent
+        const effectiveSpeed = Math.max(0.05, (this.speedPercent / 100) * 1.5);
+        this.progress += deltaSec * effectiveSpeed;
+
+        if (this.progress >= 1.0) {
+            this.progress = 0;
+            this.currentWaypointIndex++;
+
+            if (this.currentWaypointIndex >= this.waypoints.length - 1) {
+                if (!this.isLooping) {
+                    this.isPlaying = false;
+                    // Apply exact final pose
+                    this.applyInterpolatedPose(pB.joints, pB.gripper);
+                    return;
+                }
+                this.currentWaypointIndex = 0;
+            }
+        }
+
+        const t = this.smoothStep(this.progress);
+
+        if (this.motionType === 'MOVEJ') {
+            // Joint Space Interpolation
+            const interpolatedJoints = [];
+            for (let i = 0; i < 6; i++) {
+                const j = pA.joints[i] + (pB.joints[i] - pA.joints[i]) * t;
+                interpolatedJoints.push(j);
+            }
+            const interpGripper = pA.gripper + (pB.gripper - pA.gripper) * t;
+            this.applyInterpolatedPose(interpolatedJoints, interpGripper);
+        } else {
+            // Cartesian Linear Interpolation (MOVEL)
+            const fkA = this.kinematics.forwardKinematics(pA.joints);
+            const fkB = this.kinematics.forwardKinematics(pB.joints);
+
+            const cX = fkA.cartesian.x + (fkB.cartesian.x - fkA.cartesian.x) * t;
+            const cY = fkA.cartesian.y + (fkB.cartesian.y - fkA.cartesian.y) * t;
+            const cZ = fkA.cartesian.z + (fkB.cartesian.z - fkA.cartesian.z) * t;
+            const cW = fkA.cartesian.w + (fkB.cartesian.w - fkA.cartesian.w) * t;
+            const cP = fkA.cartesian.p + (fkB.cartesian.p - fkA.cartesian.p) * t;
+            const cR = fkA.cartesian.r + (fkB.cartesian.r - fkA.cartesian.r) * t;
+
+            const ikSols = this.kinematics.inverseKinematicsAllSolutions({
+                x: cX, y: cY, z: cZ, w: cW, p: cP, r: cR
+            });
+
+            if (ikSols.length > 0) {
+                // Find solution closest to pA.joints
+                let bestSol = ikSols[0];
+                let minDiff = Infinity;
+                for (const sol of ikSols) {
+                    let diff = 0;
+                    for (let k = 0; k < 6; k++) {
+                        diff += Math.abs(sol.joints[k] - pA.joints[k]);
+                    }
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        bestSol = sol;
+                    }
+                }
+                const interpGripper = pA.gripper + (pB.gripper - pA.gripper) * t;
+                this.applyInterpolatedPose(bestSol.joints, interpGripper);
+            }
+        }
+
+        // Trace visual TCP path
+        if (this.robotModel.tcpNode) {
+            const worldPos = new THREE.Vector3();
+            this.robotModel.tcpNode.getWorldPosition(worldPos);
+            this.addPathPoint(worldPos);
+        }
+    }
+
+    applyInterpolatedPose(joints, gripper) {
+        this.robotModel.updateJointAngles(joints);
+        this.robotModel.setGripperState(gripper);
+        if (this.onJointUpdate) {
+            this.onJointUpdate(joints, gripper);
+        }
+    }
+}
+
+window.TrajectoryPlanner = TrajectoryPlanner;
+
+</script>
+<script>
+/**
+ * Interactive Learning Center, Tutorials, Guided Experiments & Multi-Language Code Generator
+ */
+
+class LearningCenter {
+    constructor(kinematics, robotModel, onPoseApply) {
+        this.kinematics = kinematics;
+        this.robotModel = robotModel;
+        this.onPoseApply = onPoseApply;
+
+        this.lessons = [
+            {
+                id: 'dof',
+                title: '1. Degrees of Freedom (DOF)',
+                subtitle: 'Spatial Positioning in 3D Space (6-DOF Manipulator)',
+                content: `
+                    <h4>What is Degree of Freedom (DOF)?</h4>
+                    <p>In robotics, <strong>Degrees of Freedom (DOF)</strong> defines the number of independent variables or joint motions required to completely position and orient an object in 3D space.</p>
+                    
+                    <div class="learning-callout">
+                        <strong>Formula for Spatial Movement:</strong><br>
+                        A rigid object in 3-dimensional space has <strong>6 degrees of freedom</strong>:
+                        <ul>
+                            <li><strong>3 Translation DOFs (Position):</strong> Move along $X$, $Y$, and $Z$ axes.</li>
+                            <li><strong>3 Rotation DOFs (Orientation):</strong> Rotate about $X$ (Roll $R$), $Y$ (Pitch $P$), and $Z$ (Yaw $W$).</li>
+                        </ul>
+                    </div>
+
+                    <h4>Why 6 Joints for an Industrial Cobot?</h4>
+                    <p>Robots with fewer than 6 DOFs (like a 4-DOF SCARA or 3-DOF Delta robot) cannot reach every arbitrary angle or tilt in space. A 6-DOF articulated arm (like the <strong>Fanuc CRX-10iA</strong>) provides full dexterity: the first 3 joints ($J_1, J_2, J_3$) position the wrist center in 3D space, and the last 3 spherical wrist joints ($J_4, J_5, J_6$) rotate the tool to any desired orientation!</p>
+                `,
+                demoPose: [0, 20, 60, 0, -80, 0],
+                actionLabel: 'Load Standard 6-DOF Pose'
+            },
+            {
+                id: 'fk',
+                title: '2. Forward Kinematics (FK)',
+                subtitle: 'Mapping Joint Angles to Cartesian Tool Coordinates',
+                content: `
+                    <h4>From Joint Angles to 3D Space</h4>
+                    <p><strong>Forward Kinematics (FK)</strong> calculates the exact 3D Cartesian position $(X, Y, Z)$ and orientation $(W, P, R)$ of the end-effector from given joint angles $[\theta_1, \theta_2, \theta_3, \theta_4, \theta_5, \theta_6]$.</p>
+
+                    <div class="learning-callout">
+                        <strong>Mathematical Formulation:</strong><br>
+                        Each joint link has a 4x4 Homogeneous Transformation Matrix $A_i$. The total transformation from Base Frame (0) to Tool Flange (6) is obtained by sequential matrix multiplication:
+                        $$T_0^6 = A_1(\theta_1) \cdot A_2(\theta_2) \cdot A_3(\theta_3) \cdot A_4(\theta_4) \cdot A_5(\theta_5) \cdot A_6(\theta_6)$$
+                    </div>
+
+                    <p>FK always has a unique, unambiguous single solution for any set of joint angles. You can verify this live in the <strong>Live Matrix</strong> tab as you drag joint sliders!</p>
+                `,
+                demoPose: [-45, 30, 45, 20, -50, 15],
+                actionLabel: 'Test Forward Kinematics Pose'
+            },
+            {
+                id: 'dh',
+                title: '3. Denavit-Hartenberg (DH) Convention',
+                subtitle: 'Standardized 4-Parameter Kinematic Modeling',
+                content: `
+                    <h4>The Denavit-Hartenberg (DH) Standard</h4>
+                    <p>In 1955, Jacques Denavit and Richard Hartenberg introduced a compact 4-parameter convention to describe the spatial relationship between consecutive joint axes:</p>
+                    
+                    <table class="dh-mini-table">
+                        <thead>
+                            <tr><th>Parameter</th><th>Symbol</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Joint Angle</strong></td><td>$\theta_i$</td><td>Rotation angle about $Z_{i-1}$ axis (Variable for revolute joints)</td></tr>
+                            <tr><td><strong>Link Offset</strong></td><td>$d_i$</td><td>Distance along $Z_{i-1}$ axis from $X_{i-1}$ to $X_i$</td></tr>
+                            <tr><td><strong>Link Length</strong></td><td>$a_i$</td><td>Distance along $X_i$ axis (length of the link)</td></tr>
+                            <tr><td><strong>Link Twist</strong></td><td>$\alpha_i$</td><td>Angle from $Z_{i-1}$ to $Z_i$ measured about $X_i$</td></tr>
+                        </tbody>
+                    </table>
+
+                    <p>The standard DH 4x4 matrix for link $i$ is:</p>
+                    <div class="matrix-code-block">
+                        $$A_i = \\begin{bmatrix} 
+                        \\cos\\theta_i & -\\sin\\theta_i\\cos\\alpha_i & \\sin\\theta_i\\sin\\alpha_i & a_i\\cos\\theta_i \\\\ 
+                        \\sin\\theta_i & \\cos\\theta_i\\cos\\alpha_i & -\\cos\\theta_i\\sin\\alpha_i & a_i\\sin\\theta_i \\\\ 
+                        0 & \\sin\\alpha_i & \\cos\\alpha_i & d_i \\\\ 
+                        0 & 0 & 0 & 1 
+                        \\end{bmatrix}$$
+                    </div>
+                `,
+                demoPose: [0, 0, 0, 0, 0, 0],
+                actionLabel: 'Reset to Zero DH Baseline'
+            },
+            {
+                id: 'ik',
+                title: '4. Inverse Kinematics & 8 Configurations',
+                subtitle: 'Why up to 8 Different Arm Poses Reach the Same Target',
+                content: `
+                    <h4>Inverse Kinematics (IK) Multiplicity</h4>
+                    <p>Given a target position $(X,Y,Z)$ and orientation $(W,P,R)$, <strong>Inverse Kinematics (IK)</strong> solves for the required joint angles $[\theta_1, \dots, \theta_6]$.</p>
+
+                    <p>For an articulated 6-axis arm with a spherical wrist, there are <strong>up to 8 distinct geometric configurations</strong> that put the tool in the exact same Cartesian spot:</p>
+
+                    <div class="ik-solutions-explainer">
+                        <div class="explainer-card">
+                            <strong>1. Shoulder (Top vs Bottom / Front vs Back):</strong>
+                            <p>Base joint can point toward the target ($T$) or rotate 180° backwards ($B$) reaching over the top.</p>
+                        </div>
+                        <div class="explainer-card">
+                            <strong>2. Elbow (Up vs Down):</strong>
+                            <p>For the same shoulder position, the elbow can bend downward ($D$) or arch upward ($U$).</p>
+                        </div>
+                        <div class="explainer-card">
+                            <strong>3. Wrist (Non-Flip vs Flip):</strong>
+                            <p>The spherical wrist can align with positive pitch ($N$) or flip 180° ($F$) with inverted roll angles ($J_4, J_6$).</p>
+                        </div>
+                    </div>
+
+                    <p>This produces $2 \\times 2 \\times 2 = 8$ configurations: <code>F D T</code>, <code>N D T</code>, <code>F U T</code>, <code>N U T</code>, <code>F U B</code>, <code>N U B</code>, <code>F D B</code>, <code>N D B</code>.</p>
+                `,
+                demoPose: [-62, 26, 78, 69, -68, 75],
+                actionLabel: 'Load Screenshot Configuration (N D T)'
+            },
+            {
+                id: 'singularities',
+                title: '5. Kinematic Singularities & Jacobian',
+                subtitle: 'Loss of Degrees of Freedom & Infinite Speeds',
+                content: `
+                    <h4>What is a Kinematic Singularity?</h4>
+                    <p>A singularity occurs when the manipulator's <strong>Jacobian Matrix $J$</strong> drops in rank (meaning its determinant $\\det(J) \\to 0$). At a singularity, the robot loses the ability to move in one or more Cartesian directions, and commanding linear motion through it would require <strong>infinite joint velocity</strong>!</p>
+
+                    <h4>The Three Classic Singularities:</h4>
+                    <ul>
+                        <li><strong>Wrist Singularity ($\theta_5 = 0°$):</strong> Axes of Joint 4 and Joint 6 become collinear. The robot cannot rotate its tool pitch without moving other joints.</li>
+                        <li><strong>Shoulder Singularity:</strong> The wrist center intersects the $Z_0$ base rotation axis. The arm must rotate infinitely fast around $J_1$ to move across the center.</li>
+                        <li><strong>Elbow / Boundary Singularity:</strong> Arm is fully stretched out to its maximum reach envelope ($D = L_2 + L_3$). The arm cannot extend any further.</li>
+                    </ul>
+                `,
+                demoPose: [0, 45, 45, 0, 0, 0], // Exact Wrist Singularity (J5 = 0)
+                actionLabel: 'Demonstrate Wrist Singularity (J5 = 0°)'
+            },
+            {
+                id: 'motion',
+                title: '6. Motion Planning (MOVEJ vs MOVEL)',
+                subtitle: 'Joint-Space PTP vs Cartesian Linear Interpolation',
+                content: `
+                    <h4>PTP (MOVEJ) vs Linear (MOVEL)</h4>
+                    <div class="comparison-grid">
+                        <div class="comp-col">
+                            <h5>MOVEJ (Joint-Space Motion)</h5>
+                            <ul>
+                                <li>All 6 joints start and stop at the same time.</li>
+                                <li>Linear interpolation in joint angles: $q(t) = q_0 + t(q_1 - q_0)$.</li>
+                                <li>The tool path curves through 3D space.</li>
+                                <li><strong>Immune to singularities!</strong> Safest motion for moving between distant stations.</li>
+                            </ul>
+                        </div>
+                        <div class="comp-col">
+                            <h5>MOVEL (Cartesian Linear Motion)</h5>
+                            <ul>
+                                <li>The tool moves along a strict straight line in 3D space: $P(t) = P_0 + t(P_1 - P_0)$.</li>
+                                <li>Inverse kinematics must be calculated continuously along the path.</li>
+                                <li><strong>Can fail or trigger fault alarms</strong> if the straight line passes through a singularity or exceeds joint speed limits!</li>
+                            </ul>
+                        </div>
+                    </div>
+                `,
+                demoPose: [0, 20, 60, 0, -80, 0],
+                actionLabel: 'Ready For Trajectory Sequencing'
+            }
+        ];
+    }
+
+    /**
+     * Multi-Language Code Generator
+     * Formats current robot joint angles and pose into executable code
+     */
+    generateCode(language, jointsDeg, cartesian, config) {
+        const [j1, j2, j3, j4, j5, j6] = jointsDeg.map(v => Number(v.toFixed(2)));
+        const { x, y, z, w, p, r } = cartesian;
+
+        switch (language.toLowerCase()) {
+            case 'python':
+                return `import numpy as np
+
+# Robot Joint Coordinates (Degrees)
+q_deg = np.array([${j1}, ${j2}, ${j3}, ${j4}, ${j5}, ${j6}])
+q_rad = np.deg2rad(q_deg)
+
+# Cartesian Target Pose (FANUC Standard)
+# Position (mm): X=${x}, Y=${y}, Z=${z}
+# Orientation (deg): W=${w}, P=${p}, R=${r}
+# Configuration: ${config.fullString}
+
+def forward_kinematics_dh(q):
+    """Computes end-effector position for Fanuc CRX-10iA"""
+    # Link lengths in mm
+    d1 = 245.0; a2 = 710.0; d4 = 540.0; d6 = 160.0
+    
+    # DH Parameter Matrix: [theta, d, a, alpha]
+    dh = [
+        [q[0], d1, 0.0, np.pi/2],
+        [q[1], 0.0, a2, 0.0],
+        [q[2], 0.0, 0.0, np.pi/2],
+        [q[3], d4, 0.0, -np.pi/2],
+        [q[4], 0.0, 0.0, np.pi/2],
+        [q[5], d6, 0.0, 0.0]
+    ]
+    
+    T = np.eye(4)
+    for theta, d, a, alpha in dh:
+        ct, st = np.cos(theta), np.sin(theta)
+        ca, sa = np.cos(alpha), np.sin(alpha)
+        A = np.array([
+            [ct, -st*ca,  st*sa, a*ct],
+            [st,  ct*ca, -ct*sa, a*st],
+            [0,   sa,     ca,    d],
+            [0,   0,      0,     1]
+        ])
+        T = T @ A
+    return T
+
+T06 = forward_kinematics_dh(q_rad)
+print("Transformation Matrix T_0^6:\\n", np.round(T06, 3))
+print("Computed Tool Center Point (mm):", T06[:3, 3])
+`;
+
+            case 'fanuc':
+                return `/PROG ROBOT_SIM_MOTION
+/ATTR
+COMMENT = "Generated Kinematics Path";
+DEFAULT_GROUP = 1,*,*,*,*;
+/MN
+! Current Fanuc CRX-10iA Cobot Position
+! Configuration: ${config.fullString}
+
+  1:  ! Joint Space Move to target waypoint
+  2:  J P[1] 100% FINE ;
+  3:  ! Linear Cartesian Move with tool orientation
+  4:  L P[2] 250mm/sec FINE ;
+  5:  WAIT 0.50(sec) ;
+  6:  ! Gripper Actuation: RO[1] = ON (Clamp)
+  7:  RO[1:Gripper]=ON ;
+/POS
+P[1]{
+   GP1:
+    UF : 0, UT : 1,
+    J1 = ${j1} deg,
+    J2 = ${j2} deg,
+    J3 = ${j3} deg,
+    J4 = ${j4} deg,
+    J5 = ${j5} deg,
+    J6 = ${j6} deg
+};
+P[2]{
+   GP1:
+    UF : 0, UT : 1,
+    CONFIG : '${config.flip} ${config.elbow} ${config.shoulder}, 0, 0, 0',
+    X = ${x} mm,  Y = ${y} mm,  Z = ${z} mm,
+    W = ${w} deg, P = ${p} deg, R = ${r} deg
+};
+/END
+`;
+
+            case 'cpp':
+                return `// ROS 2 MoveIt 2 C++ Motion Controller
+#include <rclcpp/rclcpp.hpp>
+#include <moveit/move_group_interface/move_group_interface.h>
+#include <geometry_msgs/msg/pose_stamped.hpp>
+
+void executePoseGoal(moveit::planning_interface::MoveGroupInterface& move_group) {
+    // Joint Target Configuration
+    std::vector<double> joint_positions = {
+        ${(j1 * Math.PI / 180).toFixed(4)},  // Joint 1 (rad)
+        ${(j2 * Math.PI / 180).toFixed(4)},  // Joint 2 (rad)
+        ${(j3 * Math.PI / 180).toFixed(4)},  // Joint 3 (rad)
+        ${(j4 * Math.PI / 180).toFixed(4)},  // Joint 4 (rad)
+        ${(j5 * Math.PI / 180).toFixed(4)},  // Joint 5 (rad)
+        ${(j6 * Math.PI / 180).toFixed(4)}   // Joint 6 (rad)
+    };
+
+    move_group.setJointValueTarget(joint_positions);
+    moveit::planning_interface::MoveGroupInterface::Plan plan;
+    if (move_group.plan(plan) == moveit::core::MoveItErrorCode::SUCCESS) {
+        move_group.execute(plan);
+        RCLCPP_INFO(rclcpp::get_logger("Robot"), "Joint target reached!");
+    }
+}
+`;
+
+            case 'matlab':
+                return `% MATLAB Robotics System Toolbox
+% Fanuc CRX-10iA Cobot Model Setup
+
+robot = rigidBodyTree('DataFormat', 'row');
+
+% Joint Values in Radians
+q = deg2rad([${j1}, ${j2}, ${j3}, ${j4}, ${j5}, ${j6}]);
+
+% Target Cartesian Pose (X, Y, Z in meters)
+targetPos = [${(x / 1000).toFixed(4)}, ${(y / 1000).toFixed(4)}, ${(z / 1000).toFixed(4)}];
+eul = deg2rad([${w}, ${p}, ${r}]); % ZYX Euler angles
+targetRot = eul2rotm(eul, 'ZYX');
+
+targetTransform = trvec2tform(targetPos) * rotm2tform(targetRot);
+disp('Desired Target Transform:');
+disp(targetTransform);
+`;
+
+            case 'json':
+            default:
+                return JSON.stringify({
+                    robot: "Fanuc CRX-10iA",
+                    jointDegrees: [j1, j2, j3, j4, j5, j6],
+                    cartesian: { x, y, z, w, p, r },
+                    configuration: config.fullString,
+                    units: {
+                        position: "millimeters",
+                        angles: "degrees"
+                    }
+                }, null, 2);
+        }
+    }
+}
+
+window.LearningCenter = LearningCenter;
+
+</script>
+<script>
+/**
+ * Main Application Orchestrator
+ * Integrates Three.js 3D Viewport, OrbitControls, Kinematics Engine,
+ * Live Matrix Renderers, Degree of Freedom (DOF) tables, Trajectory Sequencer,
+ * and UI Event Handlers.
+ */
+
+class RoboticArmSimulator {
+    constructor() {
+        this.currentJoints = [-62, 26, 78, 69, -68, 75]; // Initial state matching user screenshot!
+        this.targetJoints = [...this.currentJoints];
+        this.animatingJoints = false;
+
+        this.initEngines();
+        this.init3DScene();
+        this.initUI();
+        this.bindEvents();
+        this.updateAll(true);
+        this.animate();
+
+        // Ensure canvas has correct dimensions and renders first frame
+        setTimeout(() => {
+            this.onWindowResize();
+            this.renderer.render(this.scene, this.camera);
+        }, 120);
+    }
+
+    initEngines() {
+        this.kinematics = new KinematicsEngine();
+        this.learning = new LearningCenter(this.kinematics, null, (pose) => this.smoothMoveTo(pose));
+    }
+
+    init3DScene() {
+        const wrapper = document.getElementById('canvas-wrapper') || document.getElementById('viewport-container');
+        this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color(0x0c0e14);
+
+        // Responsive dimensions
+        const width = wrapper.clientWidth || (window.innerWidth - 360);
+        const height = wrapper.clientHeight || (window.innerHeight - 340);
+        const aspect = width / height;
+
+        // Camera setup - Centered on robot arm
+        this.camera = new THREE.PerspectiveCamera(45, aspect, 0.05, 50);
+        this.camera.position.set(1.5, 0.9, 1.8);
+
+        // WebGL Renderer with High-Quality PBR settings
+        this.renderer = new THREE.WebGLRenderer({
+            canvas: document.getElementById('canvas-3d'),
+            antialias: true,
+            alpha: false,
+            powerPreference: 'high-performance'
+        });
+        this.renderer.setSize(width, height);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        this.renderer.toneMappingExposure = 1.2;
+
+        // Orbit Controls (with fallback protection)
+        if (typeof THREE.OrbitControls === 'function') {
+            this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+            this.controls.enableDamping = true;
+            this.controls.dampingFactor = 0.05;
+            this.controls.target.set(0, 0.55, 0.1);
+            this.controls.maxPolarAngle = Math.PI / 2 + 0.05;
+            this.controls.minDistance = 0.3;
+            this.controls.maxDistance = 6.0;
+        } else {
+            console.warn('OrbitControls fallback');
+            this.controls = { update: () => {}, target: { set: () => {} } };
+        }
+
+        // Lighting Architecture (Studio Industrial Rig)
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+        this.scene.add(ambientLight);
+
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x1e293b, 0.7);
+        this.scene.add(hemiLight);
+
+        // Key light with sharp soft shadows
+        const keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        keyLight.position.set(2.5, 4.0, 3.0);
+        keyLight.castShadow = true;
+        keyLight.shadow.mapSize.width = 2048;
+        keyLight.shadow.mapSize.height = 2048;
+        keyLight.shadow.camera.near = 0.5;
+        keyLight.shadow.camera.far = 10;
+        keyLight.shadow.camera.left = -1.5;
+        keyLight.shadow.camera.right = 1.5;
+        keyLight.shadow.camera.top = 1.5;
+        keyLight.shadow.camera.bottom = -1.5;
+        keyLight.shadow.bias = -0.0005;
+        this.scene.add(keyLight);
+
+        // Cyan Rim / Back light for crisp cobot silhouette
+        const rimLight = new THREE.DirectionalLight(0x06b6d4, 1.0);
+        rimLight.position.set(-3.0, 2.5, -2.5);
+        this.scene.add(rimLight);
+
+        // Warm Fill Light
+        const fillLight = new THREE.DirectionalLight(0x94a3b8, 0.6);
+        fillLight.position.set(1.0, 0.5, -2.0);
+        this.scene.add(fillLight);
+
+        // Build 3D Robot & Environment
+        this.robotModel = new Robot3DModel(this.scene, this.kinematics);
+        this.learning.robotModel = this.robotModel;
+
+        // Trajectory Planner
+        this.trajectory = new TrajectoryPlanner(
+            this.kinematics,
+            this.robotModel,
+            (joints, gripper) => {
+                this.currentJoints = [...joints];
+                this.updateUIJointValues();
+                this.updateAll(false);
+            }
+        );
+
+        // Resize Listener
+        window.addEventListener('resize', () => this.onWindowResize());
+        setTimeout(() => this.onWindowResize(), 100);
+    }
+
+    onWindowResize() {
+        const wrapper = document.getElementById('canvas-wrapper') || document.getElementById('viewport-container');
+        if (!wrapper) return;
+        const width = wrapper.clientWidth;
+        const height = wrapper.clientHeight;
+        if (width <= 0 || height <= 0) return;
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(width, height);
+    }
+
+    initUI() {
+        // Populate Robot Model Select
+        const modelSelect = document.getElementById('model-select');
+        modelSelect.innerHTML = '';
+        for (const [key, profile] of Object.entries(this.kinematics.robotProfiles)) {
+            const opt = document.createElement('option');
+            opt.value = key;
+            opt.textContent = profile.name;
+            if (key === this.kinematics.currentModelKey) opt.selected = true;
+            modelSelect.appendChild(opt);
+        }
+
+        // Initialize Learning Lessons
+        this.renderLessonsNav();
+        this.showLesson(0);
+
+        // Initialize Waypoints Table
+        this.renderWaypointsTable();
+
+        // Update DOF Detail Table
+        this.renderDOFTable();
+
+        // Initialize Generated Code
+        this.updateGeneratedCode();
+    }
+
+    bindEvents() {
+        const bind = (id, event, fn) => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener(event, fn);
+        };
+
+        // 1. Robot Model Change
+        bind('model-select', 'change', (e) => {
+            this.kinematics.setModel(e.target.value);
+            this.robotModel.initMaterials();
+            this.robotModel.buildRobot();
+            this.renderDOFTable();
+            this.currentJoints = [...this.kinematics.getModel().home];
+            this.updateAll(true);
+        });
+
+        // 2. Joint Sliders & Steppers
+        for (let i = 1; i <= 6; i++) {
+            const slider = document.getElementById(`slider-j${i}`);
+            const decBtn = document.getElementById(`btn-dec-j${i}`);
+            const incBtn = document.getElementById(`btn-inc-j${i}`);
+
+            if (slider) {
+                slider.addEventListener('input', (e) => {
+                    this.currentJoints[i - 1] = parseFloat(e.target.value);
+                    this.updateAll(true);
+                });
+            }
+
+            if (decBtn && slider) {
+                decBtn.addEventListener('click', () => {
+                    this.currentJoints[i - 1] = Math.max(slider.min, this.currentJoints[i - 1] - 1);
+                    slider.value = this.currentJoints[i - 1];
+                    this.updateAll(true);
+                });
+            }
+
+            if (incBtn && slider) {
+                incBtn.addEventListener('click', () => {
+                    this.currentJoints[i - 1] = Math.min(slider.max, this.currentJoints[i - 1] + 1);
+                    slider.value = this.currentJoints[i - 1];
+                    this.updateAll(true);
+                });
+            }
+        }
+
+        // 3. Cartesian Target Inputs & Solve IK
+        const cartesianInputs = ['x', 'y', 'z', 'w', 'p', 'r'];
+        cartesianInputs.forEach(axis => {
+            bind(`input-${axis}`, 'change', () => this.solveAndApplyIK());
+        });
+
+        bind('btn-solve-ik', 'click', () => this.solveAndApplyIK());
+
+        // 4. Quick Pose Buttons
+        bind('btn-zero', 'click', () => this.smoothMoveTo([0, 0, 0, 0, 0, 0]));
+        bind('btn-home', 'click', () => this.smoothMoveTo(this.kinematics.getModel().home));
+        bind('btn-ready', 'click', () => this.smoothMoveTo(this.kinematics.getModel().ready));
+        bind('btn-screenshot-pose', 'click', () => this.smoothMoveTo([-62, 26, 78, 69, -68, 75]));
+
+        // 5. Available Solution Pills
+        const solButtons = document.querySelectorAll('.sol-btn');
+        solButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetConfigCode = btn.getAttribute('data-config');
+                this.applySpecificSolution(targetConfigCode);
+            });
+        });
+
+        // 6. Gripper Controls
+        const gripperSlider = document.getElementById('gripper-slider');
+        if (gripperSlider) {
+            gripperSlider.addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value) / 100;
+                this.robotModel.setGripperState(val);
+                this.updateGripperButtons(val);
+            });
+        }
+
+        bind('btn-grip-open', 'click', () => {
+            if (gripperSlider) gripperSlider.value = 100;
+            this.robotModel.setGripperState(1.0);
+            this.updateGripperButtons(1.0);
+        });
+
+        bind('btn-grip-close', 'click', () => {
+            if (gripperSlider) gripperSlider.value = 0;
+            this.robotModel.setGripperState(0.0);
+            this.updateGripperButtons(0.0);
+        });
+
+        bind('btn-reset-objects', 'click', () => {
+            this.robotModel.resetObjectPositions();
+        });
+
+        // 7. Viewport Camera Preset Buttons
+        bind('btn-view-persp', 'click', () => this.setCameraView(1.5, 0.9, 1.8, 0, 0.55, 0));
+        bind('btn-view-top', 'click', () => this.setCameraView(0.01, 2.5, 0.1, 0, 0, 0.1));
+        bind('btn-view-front', 'click', () => this.setCameraView(0, 0.7, 2.0, 0, 0.6, 0));
+        bind('btn-view-side', 'click', () => this.setCameraView(2.0, 0.7, 0.1, 0, 0.6, 0.1));
+
+        // 8. Visual Overlay Toggles
+        const btnToggleAxes = document.getElementById('btn-toggle-axes');
+        if (btnToggleAxes) {
+            btnToggleAxes.addEventListener('click', (e) => {
+                this.robotModel.showJointAxes = !this.robotModel.showJointAxes;
+                e.currentTarget.classList.toggle('active', this.robotModel.showJointAxes);
+                this.robotModel.updateHelperVisibility();
+            });
+        }
+
+        const btnToggleFrames = document.getElementById('btn-toggle-frames');
+        if (btnToggleFrames) {
+            btnToggleFrames.addEventListener('click', (e) => {
+                this.robotModel.showFrames = !this.robotModel.showFrames;
+                e.currentTarget.classList.toggle('active', this.robotModel.showFrames);
+                this.robotModel.updateHelperVisibility();
+            });
+        }
+
+        const btnToggleCloud = document.getElementById('btn-toggle-cloud');
+        if (btnToggleCloud) {
+            btnToggleCloud.addEventListener('click', (e) => {
+                const active = !this.robotModel.showWorkspaceCloud;
+                e.currentTarget.classList.toggle('active', active);
+                this.robotModel.toggleWorkspaceCloud(active);
+            });
+        }
+
+        // 9. Bottom Drawer Tabs
+        const drawerTabs = document.querySelectorAll('.drawer-tab');
+        drawerTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                drawerTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                const drawer = document.getElementById('bottom-drawer');
+                if (drawer && drawer.classList.contains('collapsed')) {
+                    drawer.classList.remove('collapsed');
+                    const toggleBtn = document.getElementById('btn-toggle-drawer');
+                    if (toggleBtn) toggleBtn.textContent = '▼ Collapse Details Panel';
+                    setTimeout(() => this.onWindowResize(), 220);
+                }
+
+                const targetPaneId = tab.getAttribute('data-target');
+                document.querySelectorAll('.drawer-content-pane').forEach(p => p.classList.remove('active'));
+                const pane = document.getElementById(targetPaneId);
+                if (pane) pane.classList.add('active');
+
+                if (targetPaneId === 'pane-code') {
+                    this.updateGeneratedCode();
+                }
+            });
+        });
+
+        // Drawer collapse / expand
+        bind('btn-toggle-drawer', 'click', () => {
+            const drawer = document.getElementById('bottom-drawer');
+            if (!drawer) return;
+            drawer.classList.toggle('collapsed');
+            const isCollapsed = drawer.classList.contains('collapsed');
+            const toggleBtn = document.getElementById('btn-toggle-drawer');
+            if (toggleBtn) {
+                toggleBtn.textContent = isCollapsed ? '▲ Expand Details Panel' : '▼ Collapse Details Panel';
+            }
+            setTimeout(() => this.onWindowResize(), 220);
+        });
+
+        // 10. Trajectory Controls
+        bind('btn-traj-play', 'click', () => this.trajectory.play());
+        bind('btn-traj-pause', 'click', () => this.trajectory.pause());
+        bind('btn-traj-stop', 'click', () => this.trajectory.stop());
+
+        const btnLoop = document.getElementById('btn-traj-loop');
+        if (btnLoop) {
+            btnLoop.addEventListener('click', (e) => {
+                this.trajectory.isLooping = !this.trajectory.isLooping;
+                e.currentTarget.classList.toggle('active', this.trajectory.isLooping);
+            });
+        }
+
+        bind('motion-type-select', 'change', (e) => {
+            this.trajectory.motionType = e.target.value;
+        });
+
+        const speedSlider = document.getElementById('traj-speed-slider');
+        if (speedSlider) {
+            speedSlider.addEventListener('input', (e) => {
+                this.trajectory.speedPercent = parseInt(e.target.value);
+                const display = document.getElementById('traj-speed-val');
+                if (display) display.textContent = `${e.target.value}%`;
+            });
+        }
+
+        bind('btn-add-waypoint', 'click', () => {
+            this.trajectory.recordCurrentAsWaypoint(this.currentJoints, this.robotModel.gripperState);
+            this.renderWaypointsTable();
+        });
+
+        bind('btn-clear-trace', 'click', () => {
+            this.trajectory.clearPathTrace();
+        });
+
+        // 11. Code Generator Language Select & Copy
+        bind('code-lang-select', 'change', () => this.updateGeneratedCode());
+
+        bind('btn-copy-code', 'click', () => {
+            const block = document.getElementById('code-output-block');
+            if (!block) return;
+            navigator.clipboard.writeText(block.textContent).then(() => {
+                const btn = document.getElementById('btn-copy-code');
+                if (btn) {
+                    const orig = btn.textContent;
+                    btn.textContent = 'Copied!';
+                    setTimeout(() => btn.textContent = orig, 1500);
+                }
+            });
+        });
+
+        // 12. Info Modal
+        const infoModal = document.getElementById('info-modal');
+        bind('btn-info', 'click', () => {
+            if (infoModal) infoModal.style.display = 'flex';
+        });
+        bind('btn-close-modal', 'click', () => {
+            if (infoModal) infoModal.style.display = 'none';
+        });
+        if (infoModal) {
+            infoModal.addEventListener('click', (e) => {
+                if (e.target === infoModal) infoModal.style.display = 'none';
+            });
+        }
+    }
+
+    setCameraView(px, py, pz, tx, ty, tz) {
+        gsap.to(this.camera.position, {
+            x: px, y: py, z: pz,
+            duration: 0.8,
+            ease: 'power2.inOut'
+        });
+        gsap.to(this.controls.target, {
+            x: tx, y: ty, z: tz,
+            duration: 0.8,
+            ease: 'power2.inOut',
+            onUpdate: () => this.controls.update()
+        });
+    }
+
+    updateGripperButtons(val) {
+        document.getElementById('btn-grip-open').classList.toggle('active', val > 0.5);
+        document.getElementById('btn-grip-close').classList.toggle('active', val <= 0.5);
+    }
+
+    updateUIJointValues() {
+        for (let i = 1; i <= 6; i++) {
+            const val = this.currentJoints[i - 1];
+            const slider = document.getElementById(`slider-j${i}`);
+            const display = document.getElementById(`val-j${i}`);
+            if (slider && display) {
+                slider.value = val;
+                display.textContent = `${Math.round(val)}°`;
+            }
+        }
+    }
+
+    /**
+     * Master update pipeline:
+     * 1. 3D visual robot arm articulation
+     * 2. Forward Kinematics calculation
+     * 3. Cartesian target inputs (X, Y, Z, W, P, R)
+     * 4. Current Configuration string
+     * 5. Available 8 Solutions highlighting
+     * 6. 4x4 Transformation Matrix & DH table
+     * 7. 6x6 Jacobian Matrix & Singularity diagnostics
+     */
+    updateAll(updateInputs = true) {
+        // 1. 3D mesh joint updates
+        this.robotModel.updateJointAngles(this.currentJoints);
+
+        // 2. Forward Kinematics
+        const fk = this.kinematics.forwardKinematics(this.currentJoints);
+
+        // 3. Cartesian UI Display
+        if (updateInputs) {
+            document.getElementById('input-x').value = fk.cartesian.x;
+            document.getElementById('input-y').value = fk.cartesian.y;
+            document.getElementById('input-z').value = fk.cartesian.z;
+            document.getElementById('input-w').value = fk.cartesian.w;
+            document.getElementById('input-p').value = fk.cartesian.p;
+            document.getElementById('input-r').value = fk.cartesian.r;
+        }
+
+        // 4. Current Configuration
+        const configBanner = document.getElementById('current-config-display');
+        configBanner.textContent = `Current Config: ${fk.config.fullString}`;
+
+        // 5. Update Solution Pills Highlight
+        const activeConfigCode = fk.config.configKey; // e.g. "N D T"
+        document.querySelectorAll('.sol-btn').forEach(btn => {
+            const btnCode = btn.getAttribute('data-config');
+            btn.classList.toggle('active', btnCode === activeConfigCode);
+        });
+
+        // 6. Update Live Transformation Matrix Tab
+        this.renderLiveMatrix(fk.T06, fk.cumulativeMatrices);
+
+        // 7. Update Live Jacobian & Singularities
+        const jac = this.kinematics.computeJacobian(this.currentJoints);
+        this.renderJacobian(jac);
+
+        // 8. Update DH Parameters Live Values
+        this.updateLiveDHTable();
+
+        // 9. Update Joint Readout Labels
+        this.updateUIJointValues();
+    }
+
+    /**
+     * Render 4x4 Homogeneous Transformation Matrix
+     */
+    renderLiveMatrix(T06, cumulative) {
+        const matrixBody = document.getElementById('live-matrix-body');
+        if (!matrixBody) return;
+
+        let html = '';
+        for (let row = 0; row < 4; row++) {
+            html += '<tr>';
+            for (let col = 0; col < 4; col++) {
+                const val = T06[row][col];
+                const formatted = val.toFixed(3);
+                const isPos = col === 3 && row < 3;
+                const isRot = col < 3 && row < 3;
+                const cls = isPos ? 'pos-col' : (isRot ? 'rot-col' : '');
+                html += `<td class="${cls}">${formatted}</td>`;
+            }
+            html += '</tr>';
+        }
+        matrixBody.innerHTML = html;
+
+        // Tool coordinates summary
+        document.getElementById('mat-summary-pos').textContent =
+            `P = [ ${T06[0][3].toFixed(1)}, ${T06[1][3].toFixed(1)}, ${T06[2][3].toFixed(1)} ] mm`;
+    }
+
+    /**
+     * Render 6x6 Jacobian & Singularity Warnings
+     */
+    renderJacobian(jac) {
+        const jacContainer = document.getElementById('jacobian-cells');
+        if (!jacContainer) return;
+
+        let html = '';
+        for (let r = 0; r < 6; r++) {
+            for (let c = 0; c < 6; c++) {
+                const val = jac.matrix[r][c].toFixed(2);
+                html += `<div class="jac-cell">${val}</div>`;
+            }
+        }
+        jacContainer.innerHTML = html;
+
+        // Manipulability badge
+        document.getElementById('jac-manipulability').textContent =
+            `Manipulability Index (μ): ${jac.manipulability}`;
+
+        // Singularity Status Indicators
+        const dot = document.getElementById('singularity-status-dot');
+        const text = document.getElementById('singularity-status-text');
+
+        if (jac.singularities.wrist) {
+            dot.className = 'status-dot danger';
+            text.innerHTML = '<span style="color:var(--accent-red)">WRIST SINGULARITY (J5 ≈ 0°)</span>';
+        } else if (jac.singularities.shoulder) {
+            dot.className = 'status-dot warning';
+            text.innerHTML = '<span style="color:var(--accent-orange)">SHOULDER SINGULARITY (Near Center)</span>';
+        } else if (jac.singularities.boundary) {
+            dot.className = 'status-dot warning';
+            text.innerHTML = '<span style="color:var(--accent-orange)">BOUNDARY SINGULARITY (Max Reach)</span>';
+        } else {
+            dot.className = 'status-dot';
+            text.innerHTML = '<span style="color:var(--accent-green)">KINEMATICS NOMINAL (Dexterous)</span>';
+        }
+    }
+
+    /**
+     * Update Degree of Freedom (DOF) Specifications Table
+     */
+    renderDOFTable() {
+        const tableBody = document.getElementById('dof-table-body');
+        if (!tableBody) return;
+
+        const model = this.kinematics.getModel();
+        const dh = model.dh;
+
+        let html = '';
+        dh.forEach((joint, idx) => {
+            html += `
+                <tr>
+                    <td><span class="dof-badge">J${idx + 1}</span></td>
+                    <td><strong>${joint.name}</strong></td>
+                    <td>Revolute</td>
+                    <td>${idx === 0 || idx === 3 || idx === 5 ? 'Yaw / Roll' : 'Pitch'}</td>
+                    <td>${joint.min}° to +${joint.max}°</td>
+                    <td>${joint.speed} °/s</td>
+                    <td id="dof-live-val-${idx}">${this.currentJoints[idx]}°</td>
+                </tr>
+            `;
+        });
+        tableBody.innerHTML = html;
+    }
+
+    updateLiveDHTable() {
+        for (let i = 0; i < 6; i++) {
+            const cell = document.getElementById(`dof-live-val-${i}`);
+            if (cell) {
+                cell.textContent = `${Math.round(this.currentJoints[i])}°`;
+            }
+        }
+    }
+
+    /**
+     * Solve Inverse Kinematics from current Cartesian target inputs
+     */
+    solveAndApplyIK() {
+        const target = {
+            x: parseFloat(document.getElementById('input-x').value) || 0,
+            y: parseFloat(document.getElementById('input-y').value) || 0,
+            z: parseFloat(document.getElementById('input-z').value) || 0,
+            w: parseFloat(document.getElementById('input-w').value) || 0,
+            p: parseFloat(document.getElementById('input-p').value) || 0,
+            r: parseFloat(document.getElementById('input-r').value) || 0
+        };
+
+        const solutions = this.kinematics.inverseKinematicsAllSolutions(target);
+
+        if (solutions.length === 0) {
+            alert('Cartesian target is outside reachable workspace envelope!');
+            return;
+        }
+
+        // Find solution closest to current joint angles to minimize movement
+        let bestSol = solutions[0];
+        let minDiff = Infinity;
+
+        for (const sol of solutions) {
+            let diff = 0;
+            for (let i = 0; i < 6; i++) {
+                diff += Math.abs(sol.joints[i] - this.currentJoints[i]);
+            }
+            if (diff < minDiff) {
+                minDiff = diff;
+                bestSol = sol;
+            }
+        }
+
+        this.smoothMoveTo(bestSol.joints);
+    }
+
+    /**
+     * Apply specific analytical solution from the 8 configuration pills
+     */
+    applySpecificSolution(configCode) {
+        const fk = this.kinematics.forwardKinematics(this.currentJoints);
+        const solutions = this.kinematics.inverseKinematicsAllSolutions(fk.cartesian);
+
+        const match = solutions.find(s => s.configCode === configCode);
+        if (match) {
+            this.smoothMoveTo(match.joints);
+        } else {
+            console.warn(`Configuration ${configCode} unreachable for current target`);
+        }
+    }
+
+    /**
+     * Smoothly animate robot joints from current state to target joints
+     */
+    smoothMoveTo(targetJointsDeg) {
+        if (this.animatingJoints) return;
+        this.animatingJoints = true;
+
+        const startJoints = [...this.currentJoints];
+        const tweenObj = { t: 0 };
+
+        gsap.to(tweenObj, {
+            t: 1,
+            duration: 0.7,
+            ease: 'power2.out',
+            onUpdate: () => {
+                for (let i = 0; i < 6; i++) {
+                    this.currentJoints[i] = startJoints[i] + (targetJointsDeg[i] - startJoints[i]) * tweenObj.t;
+                }
+                this.updateAll(true);
+            },
+            onComplete: () => {
+                this.currentJoints = [...targetJointsDeg];
+                this.updateAll(true);
+                this.animatingJoints = false;
+            }
+        });
+    }
+
+    /**
+     * Learning Curriculum Rendering
+     */
+    renderLessonsNav() {
+        const navContainer = document.getElementById('lesson-nav-list');
+        if (!navContainer) return;
+
+        navContainer.innerHTML = '';
+        this.learning.lessons.forEach((lesson, idx) => {
+            const item = document.createElement('div');
+            item.className = `lesson-nav-item ${idx === 0 ? 'active' : ''}`;
+            item.innerHTML = `
+                <div class="lesson-nav-title">${lesson.title}</div>
+                <div class="lesson-nav-desc">${lesson.subtitle}</div>
+            `;
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.lesson-nav-item').forEach(el => el.classList.remove('active'));
+                item.classList.add('active');
+                this.showLesson(idx);
+            });
+            navContainer.appendChild(item);
+        });
+    }
+
+    showLesson(idx) {
+        const lesson = this.learning.lessons[idx];
+        const bodyContainer = document.getElementById('lesson-body-pane');
+        if (!bodyContainer || !lesson) return;
+
+        bodyContainer.innerHTML = `
+            ${lesson.content}
+            <div style="margin-top:16px;">
+                <button class="primary-btn" id="btn-lesson-action" style="padding:0 16px;">
+                    ▶ ${lesson.actionLabel}
+                </button>
+            </div>
+        `;
+
+        const actionBtn = document.getElementById('btn-lesson-action');
+        if (actionBtn) {
+            actionBtn.addEventListener('click', () => {
+                this.smoothMoveTo(lesson.demoPose);
+            });
+        }
+
+        // Re-render KaTeX if loaded
+        if (window.renderMathInElement) {
+            try {
+                renderMathInElement(bodyContainer, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ]
+                });
+            } catch (err) {
+                console.warn('Math typesetting note:', err);
+            }
+        }
+    }
+
+    /**
+     * Trajectory Waypoints Table
+     */
+    renderWaypointsTable() {
+        const tbody = document.getElementById('waypoint-table-body');
+        if (!tbody) return;
+
+        let html = '';
+        this.trajectory.waypoints.forEach((wp, idx) => {
+            const jStr = wp.joints.map(j => Math.round(j)).join(', ');
+            html += `
+                <tr class="waypoint-row ${this.trajectory.currentWaypointIndex === idx ? 'active' : ''}">
+                    <td><strong>${wp.name}</strong></td>
+                    <td>[${jStr}]</td>
+                    <td>${wp.gripper > 0.5 ? 'Open' : 'Clamped'}</td>
+                    <td>${wp.speed}%</td>
+                    <td>
+                        <button class="joint-step-btn" onclick="simulator.removeWaypoint(${idx})" style="display:inline-flex;">✕</button>
+                        <button class="joint-step-btn" onclick="simulator.smoothMoveTo([${wp.joints.join(',')}])" style="display:inline-flex;">▶</button>
+                    </td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    }
+
+    removeWaypoint(idx) {
+        this.trajectory.removeWaypoint(idx);
+        this.renderWaypointsTable();
+    }
+
+    /**
+     * Multi-Language Code Generator
+     */
+    updateGeneratedCode() {
+        const lang = document.getElementById('code-lang-select').value;
+        const fk = this.kinematics.forwardKinematics(this.currentJoints);
+        const code = this.learning.generateCode(lang, this.currentJoints, fk.cartesian, fk.config);
+        document.getElementById('code-output-block').textContent = code;
+    }
+
+    /**
+     * Main Animation & Render Loop
+     */
+    animate() {
+        requestAnimationFrame(() => this.animate());
+
+        // Update OrbitControls
+        this.controls.update();
+
+        // Update Trajectory Sequencer (delta approx 0.016s)
+        this.trajectory.update(0.016);
+
+        // Render 3D Scene
+        this.renderer.render(this.scene, this.camera);
+    }
+}
+
+// Global robust initialization with fallback
+function startSimulator() {
+    if (window.simulator) return;
+    try {
+        window.simulator = new RoboticArmSimulator();
+        console.log('Fanuc Cobot Kinematics Simulator initialized successfully!');
+    } catch (err) {
+        console.error('Fatal initialization error:', err);
+        const banner = document.createElement('div');
+        banner.style = 'position:fixed;top:0;left:0;right:0;background:#dc2626;color:#fff;padding:12px;z-index:999999;font-family:sans-serif;font-size:13px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,0.5);';
+        banner.innerHTML = '<strong>Simulator Init Error:</strong> ' + err.message;
+        document.body.prepend(banner);
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startSimulator);
+} else {
+    startSimulator();
+}
+window.addEventListener('load', startSimulator);
+
+</script>
+</body>
+</html>
