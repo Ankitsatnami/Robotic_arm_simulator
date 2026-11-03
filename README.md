@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="banner.svg" alt="Robotic Arm Simulator Banner" width="100%">
+</p>
+
 # Fanuc Cobot Kinematics Playground
 ### A Real-Time 6-DOF Robotic Arm Simulation & Kinematics Research Platform
 
